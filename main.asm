@@ -2,7 +2,9 @@ org 32768
 
 main:	halt
 	
-	;; call delsprt
+	;; delete the sprite
+	ld	hl,(posy)	; load both posx and posy since they are next to each other
+	call	delete_xy_sprite
 
 	;; call mvsprt
 	ld	a,(posx)
@@ -12,6 +14,7 @@ main:	halt
 	inc	a
 	ld	(posy),a
 
+	;; paint the sprite
 	ld	hl,(posy)	; load both posx and posy since they are next to each other
 	call 	paint_xy_sprite
 	

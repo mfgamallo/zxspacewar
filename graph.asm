@@ -46,6 +46,41 @@ pslp:	ld 	a,(hl)		; get one byte
 	pop	bc		; restore state
 	ret
 
+;;; Delete a sprite
+;;; HL containing X and Y
+delete_xy_sprite:
+	push	de		; store current state
+
+	call	pos_to_address
+	ex	de,hl
+	call	delete_sprite
+
+	pop	de		; restore state
+	ret
+
+;;; Delete a sprite 24 pixels wide and 16 pixels tall
+;;; DE pointing to screen
+delete_sprite:
+	push	bc		; store current state
+	ld	b,16		; the sprite is 16 lines high
+	
+dslp:	ld 	a,0		; deleting
+	ld	(de),a		; put in on the screen
+	inc	e		; next column
+	ld	(de),a
+	inc	e
+	ld	(de),a
+	
+	dec	e		; point to the beginning of the sprite
+	dec	e
+	ex	de,hl
+	call	line_down	; next line of the sprite
+	ex	de,hl
+	djnz	dslp
+
+	pop	bc		; restore state
+	ret
+
 ;;; Calculate the next line down
 ;;; HL pointing to a point in the screen
 ;;; Return HL pointing to the point immediately down
