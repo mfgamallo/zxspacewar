@@ -1,3 +1,23 @@
+;;; Paint a sprite with the position in 16bit words
+;;; HL containing X
+;;; DE containing Y
+paint_dw_sprite:
+	ld	l,d
+	call 	paint_xy_sprite
+	ret
+
+;;; Delete a sprite with the position in 16bit words
+;;; HL containing X
+;;; DE containing Y
+delete_dw_sprite:	
+	ld	l,d
+	call 	delete_xy_sprite
+	ret
+	
+;;; --------------------------------------------------
+;;; past this point only single bytes are considered - fixed point arithmetic no longer applies
+;;; --------------------------------------------------
+
 ;;; Paint a sprite
 ;;; HL containing X and Y
 paint_xy_sprite:

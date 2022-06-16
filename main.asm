@@ -3,15 +3,17 @@ org 32768
 main:	halt
 	
 	;; delete the sprite
-	ld	hl,(posy)	; load both posx and posy since they are next to each other
-	call	delete_xy_sprite
+	ld	hl,(posx)
+	ld	de,(posy)
+	call	delete_dw_sprite
 
 	;; move the sprite
 	call	move
 
 	;; paint the sprite
-	ld	hl,(posy)	; load both posx and posy since they are next to each other
-	call 	paint_xy_sprite
+	ld	hl,(posx)
+	ld	de,(posy)
+	call 	paint_dw_sprite
 	
 	jr 	main
 
@@ -22,42 +24,38 @@ move:
 	;; simplified acc:	K * ( m0 * m1 * (y0-y1) )  /  ( (x0-x1)^2 + (y0-y1)^2 )
 	
 
-	ld	a,(accx)	; update velx
-	ld	b,a
-	ld	a,(velx)
-	add	a,b
-	ld	(velx),a
+	ld	hl,(velx)	; update velx
+	ld	de,(accx)
+	add	hl,de	 
+	ld	(velx),hl
 
-	ld	a,(accx)	; update vely
-	ld	b,a
-	ld	a,(velx)
-	add	a,b
-	ld	(velx),a
+	ld	hl,(vely)	; update vely
+	ld	de,(accy)
+	add	hl,de	 
+	ld	(vely),hl
 
-	ld	a,(velx)	; update posx
-	ld	b,a
-	ld	a,(posx)
-	add	a,b
-	ld	(posx),a
+	ld	hl,(posx)	; update posx
+	ld	de,(velx)
+	add	hl,de
+	ld	(posx),hl
 
-	ld	a,(vely)	; update posy
-	ld	b,a
-	ld	a,(posy)
-	add	a,b
-	ld	(posy),a
+	ld	hl,(posy)	; update posy
+	ld	de,(vely)
+	add	hl,de
+	ld	(posy),hl
 
 	pop	bc		; restore state
 	ret
 
 include	"graph.asm"
 	
-posy:	db	0		; range is 0 - 255
-posx:	db	0		; range is 0 - 192
+posx:	dw	0		; range is 0 - $C000
+posy:	dw	0		; range is 0 - $FF00
 
-velx:	db	1		; range is -128 - 127
-vely:	db	0		; range is -128 - 127
+velx:	dw	$0100		; range is 0 - $FF00 (signed)
+vely:	dw	$0000		; range is 0 - $FF00 (signed)
 
-accx:	db	0		; range is -128 - 127
-accy:	db	0		; range is -128 - 127
+accx:	dw	$0000		; range is 0 - $FF00 (signed)
+accy:	dw	$0000		; range is 0 - $FF00 (signed)
 
 end 32768
