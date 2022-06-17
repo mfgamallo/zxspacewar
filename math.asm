@@ -1,0 +1,267 @@
+;;; Multiply two 16bit numbers
+;;; HL and DE contain the factors
+
+;;; Taken from http://z80-heaven.wikidot.com/advanced-math
+mul8:
+;;; Inputs:
+;;;  H and E
+;;; Outputs:
+;;;  HL is the product
+;;;  D is 0
+;;;  A,E,B,C are preserved
+;36 bytes
+;min: 190cc
+;max: 242cc
+;avg: 216cc
+
+	ld	d,0
+	ld	l,d
+	sla	h
+	jr 	nc,$+3
+	ld 	l,e
+	add 	hl,hl
+	jr 	nc,$+3
+	add 	hl,de
+	add 	hl,hl
+	jr	nc,$+3
+	add 	hl,de
+	add 	hl,hl
+	jr 	nc,$+3
+	add 	hl,de
+	add 	hl,hl
+	jr 	nc,$+3
+	add 	hl,de
+	add 	hl,hl
+	jr	nc,$+3
+	add 	hl,de
+	add 	hl,hl
+	jr 	nc,$+3
+	add 	hl,de
+	add 	hl,hl
+	ret 	nc
+	add 	hl,de
+	ret
+	
+;;; Taken from https://github.com/Zeda/z80float/blob/master/common/mul16.z80
+;;; This was made by Runer112
+;;; Tested by jacobly
+mul16:
+;;; BC*DE --> DEHL
+;;; ~544.887cc as calculated in jacobly's test
+;;; min: 214cc  (DE = 1)
+;;; max: 667cc
+;;; avg: 544.4507883cc   however, deferring to jacobly's result as mine may have math issues ?
+;;; 177 bytes
+	ld	a,d
+	ld	d,0
+	ld	h,b
+	ld	l,c
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit14
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit13
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit12
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit11
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit10
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit9
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit8
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit7
+	ld	a,e
+ 	and	%11111110
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit6
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit5
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit4
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit3
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit2
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit1
+	add	a,a
+	jr	c,Mul_BC_DE_DEHL_Bit0
+	rr	e
+	ret	c
+	ld	h,d
+	ld	l,e
+	ret
+
+Mul_BC_DE_DEHL_Bit14:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit13
+	add	hl,bc
+	adc	a,d
+Mul_BC_DE_DEHL_Bit13:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit12
+	add	hl,bc
+	adc	a,d
+Mul_BC_DE_DEHL_Bit12:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit11
+	add	hl,bc
+	adc	a,d
+Mul_BC_DE_DEHL_Bit11:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit10
+	add	hl,bc
+	adc	a,d
+Mul_BC_DE_DEHL_Bit10:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit9
+	add	hl,bc
+	adc	a,d
+Mul_BC_DE_DEHL_Bit9:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit8
+	add	hl,bc
+	adc	a,d
+Mul_BC_DE_DEHL_Bit8:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit7
+	add	hl,bc
+	adc	a,d
+Mul_BC_DE_DEHL_Bit7:
+	ld	d,a
+	ld	a,e
+	and	%11111110
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit6
+	add	hl,bc
+	adc	a,0
+Mul_BC_DE_DEHL_Bit6:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit5
+	add	hl,bc
+	adc	a,0
+Mul_BC_DE_DEHL_Bit5:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit4
+	add	hl,bc
+	adc	a,0
+Mul_BC_DE_DEHL_Bit4:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit3
+	add	hl,bc
+	adc	a,0
+Mul_BC_DE_DEHL_Bit3:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit2
+	add	hl,bc
+	adc	a,0
+Mul_BC_DE_DEHL_Bit2:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit1
+	add	hl,bc
+	adc	a,0
+Mul_BC_DE_DEHL_Bit1:
+	add	hl,hl
+	adc	a,a
+	jr	nc,Mul_BC_DE_DEHL_Bit0
+	add	hl,bc
+	adc	a,0
+Mul_BC_DE_DEHL_Bit0:
+	add	hl,hl
+	adc	a,a
+	jr	c,Mul_BC_DE_DEHL_FunkyCarry
+	rr	e
+	ld	e,a
+	ret	nc
+	add	hl,bc
+	ret	nc
+	inc	e
+	ret	nz
+	inc	d
+	ret
+
+Mul_BC_DE_DEHL_FunkyCarry:
+	inc	d
+	rr	e
+	ld	e,a
+	ret	nc
+	add	hl,bc
+	ret	nc
+	inc	e
+	ret
+
+
+mulfixed8_8:
+	push 	bc		; store current state
+	call 	mulfixed8_8_unsafe
+	pop 	bc		; restore status
+	ret
+	
+;;; Taken from http://z80-heaven.wikidot.com/advanced-math
+mulfixed8_8_unsafe:
+;;; Multiplies H.L by D.E, stores the result in H.L
+;;; First, find out if the output is positive or negative
+	ld a,h
+	xor d	
+	push af   ;sign bit is the result sign bit
+
+;;; Now make sure the inputs are positive
+	xor d     			; A now has the value of H, since I XORed it with D twice (cancelling)
+	jp p,mulfixed8_8_lbl1   	; if Positive, don't negate
+	xor a
+	sub l
+	ld l,a
+	sbc a,a
+	sub h
+	ld h,a
+mulfixed8_8_lbl1:
+	bit 7,d
+	jr z,mulfixed8_8_lbl2
+	xor a
+	sub e
+	ld e,a
+	sbc a,a
+	sub d
+	ld d,a
+mulfixed8_8_lbl2:
+;;; Now we need to put DE in BC to use mul16
+	ld b,d
+	ld c,e
+	call mul16
+
+;;; Get the middle two bytes, EH, and put them in HL
+	ld l,h
+	ld h,e
+
+;;; We should check for overflow. If D>0, we will set HL to 0x7FFF
+	ld a,d
+	or a
+	jr z,mulfixed8_8_lbl3
+	ld hl,$7FFF
+mulfixed8_8_lbl3:
+
+;;; Now we need to restore the sign
+  	pop af
+	ret p    		; don't need to do anything, result is already positive
+	xor a
+	sub l
+	ld l,a
+	sbc a,a
+	sub h
+	ld h,a
+	ret

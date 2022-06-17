@@ -1,6 +1,15 @@
 org 32768
 
 main:	halt
+
+	;; experiments
+	;; xor	a
+	;; ld	hl,$ff00
+	;; ld	de,$8000
+	;; sbc	hl,de
+	ld	hl,$0400
+	ld	de,$0200
+	call distance_term
 	
 	;; delete the sprite
 	ld	hl,(posx)
@@ -21,8 +30,8 @@ move:
 	push	bc		; store current state
 
 	;; update accy
-	;; simplified acc:	K * ( m0 * m1 * (y0-y1) )  /  ( (x0-x1)^2 + (y0-y1)^2 )
-	
+	;; simplified accx:	K * ( m0 * (x0-x1) )  /  ( (x0-x1)^2 + (y0-y1)^2 )
+	;; simplified accy:	K * ( m0 * (y0-y1) )  /  ( (x0-x1)^2 + (y0-y1)^2 )
 
 	ld	hl,(velx)	; update velx
 	ld	de,(accx)
@@ -47,7 +56,11 @@ move:
 	pop	bc		; restore state
 	ret
 
-include	"graph.asm"
+	
+	include	"graph.asm"
+	include "math.asm"
+	include "newton.asm"
+
 	
 posx:	dw	0		; range is 0 - $C000
 posy:	dw	0		; range is 0 - $FF00
