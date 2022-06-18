@@ -7,9 +7,19 @@ main:	halt
 	;; ld	hl,$ff00
 	;; ld	de,$8000
 	;; sbc	hl,de
-	ld	hl,$0400
-	ld	de,$0200
-	call distance_term
+	;; ld	hl,$0400
+	;; ld	de,$0200
+	;; call distance_term
+	ld	ix,accel_args
+	ld	(ix),$01	; x1
+	ld	(ix+1),$01
+	ld	(ix+2),$01	; y1
+	ld	(ix+3),$01
+	ld	(ix+4),$88	; x2
+	ld	(ix+5),$00
+	ld	(ix+6),$88	; y2
+	ld	(ix+7),$02
+	call	distance
 	
 	;; delete the sprite
 	ld	hl,(posx)
