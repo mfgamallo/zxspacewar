@@ -265,3 +265,106 @@ mulfixed8_8_lbl3:
 	sub h
 	ld h,a
 	ret
+
+;;; Taken form http://z80-heaven.wikidot.com/advanced-math#toc32
+BC_Div_DE_88:
+;; ;Inputs:
+;;; DE,BC are 8.8 Fixed Point numbers
+;;; Outputs:
+;;; DE is the 8.8 Fixed Point result (rounded to the least significant bit)
+;;; if DE is 0 : 122cc or 136cc if BC is negative
+;;; if |BC|>=128*|DE| : 152cc or 166cc if BC is negative
+;;; Otherwise:
+;;; min: 1107cc
+;;; max: 1319cc
+;;; avg: 1201cc
+
+;;; First, find out if the output is positive or negative
+	ld a,b
+	xor d
+	push af  ; sign bit is the result sign bit
+
+;;; Now make sure the inputs are positive
+	xor b     ; A now has the value of B, since I XORed it with D twice (cancelling)
+	jp p,BC_Div_DE_88_lbl1   ; if Positive, don't negate
+	xor a
+	sub c
+	ld c,a
+	sbc a,a
+	sub b
+	ld b,a
+BC_Div_DE_88_lbl1:
+
+;;; now make DE negative to optimize the remainder comparison
+	ld a,d
+	or d
+	jp m,BC_Div_DE_88_lbl2
+	xor a
+	sub e
+	ld e,a
+	sbc a,a
+	sub d
+	ld d,a
+BC_Div_DE_88_lbl2:
+
+;;; if DE is 0, we can call it an overflow
+;;; A is the current value of D
+	or e
+	jr z,div_fixed88_overflow
+
+;;; The accumulator gets set to B if no overflow.
+;;; We can use H=0 to save a few cc in the meantime
+	ld h,0
+
+;;; if B+DE>=0, then we'll have overflow
+	ld a,b
+	add a,e
+	ld a,d
+	adc a,h
+	jr c,div_fixed88_overflow
+
+;;; Now we can load the accumulator/remainder with B
+;;; H is already 0
+	ld l,b
+
+	ld a,c
+	call div_fixed88_sub
+	ld c,a
+
+	ld a,b      ; A is now 0
+	call div_fixed88_sub
+
+	ld d,c
+	ld e,a
+	pop af
+	ret p
+	xor a
+	sub e
+	ld e,a
+	sbc a,a
+	sub d
+	ld d,a
+	ret
+
+div_fixed88_overflow:
+	ld de,$7FFF
+	pop af
+	ret p
+	inc de
+	inc e
+	ret
+
+div_fixed88_sub:
+;;; min: 456cc
+;;; max: 536cc
+;;; avg: 496cc
+	ld b,8
+BC_Div_DE_88_lbl3:
+	rla
+	adc hl,hl
+	add hl,de
+	jr c,$+4
+	sbc hl,de
+	djnz BC_Div_DE_88_lbl3
+	adc a,a
+	ret
