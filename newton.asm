@@ -20,6 +20,8 @@ accel:
 	ld	b,(ix+4)
 	ld	c,(ix+5)
 	sbc	hl,bc
+	srl	h
+	rr	l
 	ld	(accel_dx),hl	; x axis distance
 	call	distance_term
 	ex	de,hl
@@ -28,6 +30,8 @@ accel:
 	ld	b,(ix+6)
 	ld	c,(ix+7)
 	sbc	hl,bc
+	srl	h
+	rr	l
 	ld	(accel_dy),hl	; y axis distance
 	call	distance_term
 	add	hl,de
@@ -36,49 +40,44 @@ accel:
 	ex	de,hl
 	ld	bc,(accel_dx)
 	call	BC_Div_DE_88
+	srl	d
+	rr	e
+	srl	d
+	rr	e
+	srl	d
+	rr	e
+	srl	d
+	rr	e
+	srl	d
+	rr	e
+	srl	d
+	rr	e
+	srl	d
+	rr	e
+	srl	d
+	rr	e
 	push	de		; accel x
 
 	ld	de,(accel_d)
 	ld	bc,(accel_dy)
 	call	BC_Div_DE_88	; accel_y in DE
+	srl	d
+	rr	e
+	srl	d
+	rr	e
+	srl	d
+	rr	e
+	srl	d
+	rr	e
+	srl	d
+	rr	e
+	srl	d
+	rr	e
+	srl	d
+	rr	e
+	srl	d
+	rr	e
 	pop	bc		; accel_x in BC
-
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	b
-	rr	c
-	srl	b
-	rr	c
-	srl	b
-	rr	c
-	srl	b
-	rr	c
-	srl	b
-	rr	c
-	srl	b
-	rr	c
-	srl	b
-	rr	c
-	srl	b
-	rr	c
-	srl	b
-	rr	c
 
 	pop	hl		; restore status
 	ret

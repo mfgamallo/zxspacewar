@@ -44,31 +44,43 @@ move:
 	;; simplified accy:	K * ( m0 * (y0-y1) )  /  ( (x0-x1)^2 + (y0-y1)^2 )
 	ld	ix,accel_args
 	ld	hl,(sunx)	; x0
-	srl	h
-	rr	l
 	ld	(ix),h
 	ld	(ix+1),l
 	ld	hl,(suny)	; y0
-	srl	h
-	rr	l
 	ld	(ix+2),h
 	ld	(ix+3),l
 	ld	hl,(posx)	; x1
-	srl	h
-	rr	l
 	ld	(ix+4),h
 	ld	(ix+5),l
 	ld	hl,(posy)	; y1
-	srl	h
-	rr	l
 	ld	(ix+6),h
 	ld	(ix+7),l
 	call	accel
+	
+	ld	a,(sunx+1)	; whole part of the 8,8 number representing the x axis of th elocation of the sun
+	ld	hl,posx+1
+	cp	(hl)
+	jp	m,acc_x_neg
 	ld	hl,(accx)
 	add	hl,bc
+	jp	acc_x_end
+acc_x_neg:
+	ld	hl,(accx)
+	sbc	hl,bc
+acc_x_end:	
 	ld	(accx),hl	; new accx
+
+	ld	a,(suny+1)	; whole part of the 8.8 number representing the y axis of the location of the sun
+	ld	hl,posy+1
+	cp	(hl)
+	jp	m,acc_y_neg
 	ld	hl,(accy)
 	add	hl,de
+	jp	acc_y_end
+acc_y_neg:
+	ld	hl,(accy)
+	sbc	hl,de
+acc_y_end:	
 	ld	(accy),hl	; new accy
 
 	ld	hl,(velx)	; update velx
@@ -100,10 +112,10 @@ move:
 	include "newton.asm"
 
 	
-posx:	dw	0		; range is 0 - $C000
-posy:	dw	0		; range is 0 - $FF00
+posx:	dw	$6000		; range is 0 - $C000
+posy:	dw	$4000		; range is 0 - $FF00
 
-velx:	dw	$0100		; range is 0 - $FF00 (signed)
+velx:	dw	$0000		; range is 0 - $FF00 (signed)
 vely:	dw	$0000		; range is 0 - $FF00 (signed)
 
 accx:	dw	$0000		; range is 0 - $FF00 (signed)
