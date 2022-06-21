@@ -95,27 +95,93 @@ acc_y_end:
 
 	ld	hl,(posx)	; update posx
 	ld	de,(velx)
-	add	hl,de
+	call	update_posx
 	ld	(posx),hl
 
 	ld	hl,(posy)	; update posy
 	ld	de,(vely)
-	add	hl,de
+	call	update_posy
 	ld	(posy),hl
 
 	pop	bc		; restore state
 	ret
 
+;;; Takes the current position in HL and the speed in DE
+;;; Returns the position in HL taking limits into account
+update_posy:
+	push	bc
 	
+	add	hl,de
+	push	hl
+	ld	bc,$b000
+	sbc	hl,bc
+	pop	hl
+	jp	c,update_posy_end
+	ld	a,d
+	and	a
+	jp	p,update_posy_max
+	ld	hl,$0000
+	jp	update_posy_end
+update_posy_max:
+	ld	hl,$b000
+update_posy_end:	
+	pop	bc
+	ret
+	
+;;; Takes the current position in HL and the speed in DE
+;;; Returns the position in HL taking limits into account
+;;; if pos is positive (0-127)
+;;; 	and vel is negative (128-255)
+;;; 	and + is negative
+;;; 		then result is 0
+;;; if pos is negative (128-255)
+;;; 	and vel is positive (0-127)
+;;; 	and + is positive
+;;; 		then result is 255
+update_posx:
+	ld	a,h
+	and	a
+	jp	m,update_posx_next
+	ld	a,d
+	and	a
+	jp	p,update_posx_sum_end
+	add	hl,de
+	ld	a,h
+	and	a
+	jp	p,update_posx_end
+	ld	hl,$0000
+update_posx_end:
+	push	hl
+	ld	de,$f400
+	sbc	hl,de
+	pop	hl
+	jp	c,update_posx_check_end
+	ld	hl,$f400
+update_posx_check_end:
+	ret
+update_posx_sum_end:
+	add	hl,de
+	ret
+update_posx_next:
+	ld	a,d
+	and	a
+	jp	m,update_posx_sum_end
+	add	hl,de
+	ld	a,h
+	and	a
+	jp	m,update_posx_end
+	ld	hl,$f400
+	ret
+
 	include	"graph.asm"
 	include "math.asm"
 	include "newton.asm"
 
 	
-posx:	dw	$4000		; range is 0 - $C000
-posy:	dw	$3000		; range is 0 - $FF00
+posx:	dw	$0000		; range is 0 - $C000
+posy:	dw	$6000		; range is 0 - $FF00
 
-velx:	dw	$0100		; range is 0 - $FF00 (signed)
+velx:	dw	$1000		; range is 0 - $FF00 (signed)
 vely:	dw	$0000		; range is 0 - $FF00 (signed)
 
 sunx:	dw	$8000
