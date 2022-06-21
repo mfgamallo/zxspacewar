@@ -16,12 +16,15 @@ accel:
 	push	hl		; store current status
 	
 	ld	h,(ix)
-	ld	l,(ix+1)
+	ld	l,(ix+1)	
 	ld	b,(ix+4)
 	ld	c,(ix+5)
-	sbc	hl,bc
 	srl	h
 	rr	l
+	srl	b
+	rr	c
+	call	order_asc
+	sbc	hl,bc
 	ld	(accel_dx),hl	; x axis distance
 	call	distance_term
 	ex	de,hl
@@ -29,55 +32,63 @@ accel:
 	ld	l,(ix+3)
 	ld	b,(ix+6)
 	ld	c,(ix+7)
-	sbc	hl,bc
 	srl	h
 	rr	l
+	srl	b
+	rr	c
+	call	order_asc
+	sbc	hl,bc
 	ld	(accel_dy),hl	; y axis distance
 	call	distance_term
-	add	hl,de
+	srl	h
+	rr	l
+	srl	d
+	rr	e
+	add	hl,de		; can't be negative
 	ld	(accel_d),hl	; distance
 
 	ex	de,hl
 	ld	bc,(accel_dx)
 	call	BC_Div_DE_88
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
 	push	de		; accel x
 
 	ld	de,(accel_d)
 	ld	bc,(accel_dy)
 	call	BC_Div_DE_88	; accel_y in DE
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
-	srl	d
-	rr	e
 	pop	bc		; accel_x in BC
+
+	srl	b
+	rr	c
+	srl	d
+	rr	e
+	srl	b
+	rr	c
+	srl	d
+	rr	e
+	srl	b
+	rr	c
+	srl	d
+	rr	e
+	srl	b
+	rr	c
+	srl	d
+	rr	e
+	srl	b
+	rr	c
+	srl	d
+	rr	e
+	srl	b
+	rr	c
+	srl	d
+	rr	e
+	srl	b
+	rr	c
+	srl	d
+	rr	e
+	srl	b
+	rr	c
+	srl	d
+	rr	e
 
 	pop	hl		; restore status
 	ret
@@ -96,6 +107,29 @@ distance_term:
 	call	mul8
 
 	pop	de		; restore state
+	pop	bc
+	ret
+	;; push	de		; store current state
+	
+	;; ld	d,h
+	;; ld	e,l
+	;; call	mulfixed8_8
+
+	;; pop	de		; restore state
+	;; ret
+
+;;; Gets a number in HL and another in BC.
+;;; Ensures that the lowest is in BC and the highest in HL
+order_asc:
+	push	hl
+	push	bc
+	sbc	hl,bc
+	jp	m,order_asc_neg
+	pop	bc
+	pop	hl
+	ret
+order_asc_neg:
+	pop	hl
 	pop	bc
 	ret
 	

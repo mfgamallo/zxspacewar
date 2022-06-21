@@ -56,42 +56,42 @@ move:
 	ld	(ix+6),h
 	ld	(ix+7),l
 	call	accel
-	
-	ld	a,(sunx+1)	; whole part of the 8,8 number representing the x axis of th elocation of the sun
-	ld	hl,posx+1
-	cp	(hl)
+
+	push	de		; keep de because it contains d_acc_y
+	ld	de,(posx)
+	srl	d
+	rr	e
+	ld	hl,(sunx)
+	srl	h
+	rr	l
+	sbc	hl,de
 	jp	m,acc_x_neg
-	ld	hl,(accx)
+	ld	hl,(velx)
 	add	hl,bc
 	jp	acc_x_end
 acc_x_neg:
-	ld	hl,(accx)
+	ld	hl,(velx)
 	sbc	hl,bc
 acc_x_end:	
-	ld	(accx),hl	; new accx
+	ld	(velx),hl	; new velx
 
-	ld	a,(suny+1)	; whole part of the 8.8 number representing the y axis of the location of the sun
-	ld	hl,posy+1
-	cp	(hl)
+	pop	de		; restore de because it contains the d_acc_y
+	ld	bc,(posy)
+	srl	b
+	rr	c
+	ld	hl,(suny)
+	srl	h
+	rr	l
+	sbc	hl,bc
 	jp	m,acc_y_neg
-	ld	hl,(accy)
+	ld	hl,(vely)
 	add	hl,de
 	jp	acc_y_end
 acc_y_neg:
-	ld	hl,(accy)
+	ld	hl,(vely)
 	sbc	hl,de
 acc_y_end:	
-	ld	(accy),hl	; new accy
-
-	ld	hl,(velx)	; update velx
-	ld	de,(accx)
-	add	hl,de	 
-	ld	(velx),hl
-
-	ld	hl,(vely)	; update vely
-	ld	de,(accy)
-	add	hl,de	 
-	ld	(vely),hl
+	ld	(vely),hl	; new vely
 
 	ld	hl,(posx)	; update posx
 	ld	de,(velx)
@@ -112,14 +112,11 @@ acc_y_end:
 	include "newton.asm"
 
 	
-posx:	dw	$6000		; range is 0 - $C000
-posy:	dw	$4000		; range is 0 - $FF00
+posx:	dw	$4000		; range is 0 - $C000
+posy:	dw	$3000		; range is 0 - $FF00
 
-velx:	dw	$0000		; range is 0 - $FF00 (signed)
+velx:	dw	$0100		; range is 0 - $FF00 (signed)
 vely:	dw	$0000		; range is 0 - $FF00 (signed)
-
-accx:	dw	$0000		; range is 0 - $FF00 (signed)
-accy:	dw	$0000		; range is 0 - $FF00 (signed)
 
 sunx:	dw	$8000
 suny:	dw	$6000
