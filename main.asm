@@ -2,6 +2,16 @@ org 32768
 
 main:	halt
 
+	;; read keyboard
+	ld	bc,$dffe
+	in	a,(c)
+	ld	b,a
+	and	$01		; test por 'P'
+	call	z,p_key_pressed
+	ld	a,b
+	and	$02		; test for 'O'
+	call	z,o_key_pressed
+
 	;; delete the sprite
 	ld	hl,(posx)
 	ld	de,(posy)
@@ -18,15 +28,20 @@ main:	halt
 	
 	jr 	main
 
-move:
-	push	bc		; store current state
-
-	;; -----------------------------------
-	;; remove when we have key handling
-	;; -----------------------------------
+p_key_pressed:
 	ld	a,(rot)
 	inc	a
 	ld	(rot),a
+	ret
+
+o_key_pressed:
+	ld	a,(rot)
+	dec	a
+	ld	(rot),a
+	ret
+
+move:
+	push	bc		; store current state
 	
 	;; update accy
 	;; simplified accx:	K * ( m0 * (x0-x1) )  /  ( (x0-x1)^2 + (y0-y1)^2 )
