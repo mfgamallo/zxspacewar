@@ -2,25 +2,6 @@ org 32768
 
 main:	halt
 
-	;; experiments
-	;; xor	a
-	;; ld	hl,$ff00
-	;; ld	de,$8000
-	;; sbc	hl,de
-	;; ld	hl,$0400
-	;; ld	de,$0200
-	;; call distance_term
-	;; ld	ix,accel_args
-	;; ld	(ix),$01	; x1
-	;; ld	(ix+1),$01
-	;; ld	(ix+2),$01	; y1
-	;; ld	(ix+3),$01
-	;; ld	(ix+4),$88	; x2
-	;; ld	(ix+5),$00
-	;; ld	(ix+6),$88	; y2
-	;; ld	(ix+7),$02
-	;; call	accel
-	
 	;; delete the sprite
 	ld	hl,(posx)
 	ld	de,(posy)
@@ -30,6 +11,7 @@ main:	halt
 	call	move
 
 	;; paint the sprite
+	ld	a,(rot)
 	ld	hl,(posx)
 	ld	de,(posy)
 	call 	paint_dw_sprite
@@ -39,6 +21,13 @@ main:	halt
 move:
 	push	bc		; store current state
 
+	;; -----------------------------------
+	;; remove when we have key handling
+	;; -----------------------------------
+	ld	a,(rot)
+	inc	a
+	ld	(rot),a
+	
 	;; update accy
 	;; simplified accx:	K * ( m0 * (x0-x1) )  /  ( (x0-x1)^2 + (y0-y1)^2 )
 	;; simplified accy:	K * ( m0 * (y0-y1) )  /  ( (x0-x1)^2 + (y0-y1)^2 )
@@ -177,11 +166,13 @@ update_posx_next:
 	include "math.asm"
 	include "newton.asm"
 
-	
-posx:	dw	$0000		; range is 0 - $C000
-posy:	dw	$6000		; range is 0 - $FF00
 
-velx:	dw	$1000		; range is 0 - $FF00 (signed)
+rot:	db	$00		; rotation
+	
+posx:	dw	$8000		; range is 0 - $C000
+posy:	dw	$2000		; range is 0 - $FF00
+
+velx:	dw	$0180		; range is 0 - $FF00 (signed)
 vely:	dw	$0000		; range is 0 - $FF00 (signed)
 
 sunx:	dw	$8000
