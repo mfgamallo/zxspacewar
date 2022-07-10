@@ -11,6 +11,11 @@ main:	halt
 	ld	a,b
 	and	$02		; test for 'O'
 	call	z,o_key_pressed
+	
+	ld	bc,$fbfe
+	in	a,(c)
+	and	$01		; test for 'Q'
+	call	z,q_key_pressed
 
 	;; delete the sprite
 	ld	hl,(posx)
@@ -38,6 +43,17 @@ o_key_pressed:
 	ld	a,(rot)
 	dec	a
 	ld	(rot),a
+	ret
+
+q_key_pressed:
+	ld	a,(rot)
+	call	thrust
+	ld	hl,(velx)
+	add	hl,bc
+	ld	(velx),hl
+	ld	hl,(vely)
+	add	hl,de
+	ld	(vely),hl
 	ret
 
 move:
