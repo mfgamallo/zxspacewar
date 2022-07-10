@@ -172,11 +172,11 @@ update_posx:
 	ld	hl,$0000
 update_posx_end:
 	push	hl
-	ld	de,$f400
+	ld	de,$f000
 	sbc	hl,de
 	pop	hl
 	jp	c,update_posx_check_end
-	ld	hl,$f400
+	ld	hl,$f000
 update_posx_check_end:
 	ret
 update_posx_sum_end:
@@ -190,7 +190,7 @@ update_posx_next:
 	ld	a,h
 	and	a
 	jp	m,update_posx_end
-	ld	hl,$f400
+	ld	hl,$f000
 	ret
 
 	include	"graph.asm"
