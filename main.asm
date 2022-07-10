@@ -22,6 +22,9 @@ main:	halt
 	ld	de,(posy)
 	call	delete_dw_sprite
 
+	;; paint the star
+	call	paint_center_star
+
 	;; move the sprite
 	call	move
 
@@ -196,7 +199,7 @@ update_posx_next:
 	include	"graph.asm"
 	include "math.asm"
 	include "newton.asm"
-
+	include "star.asm"
 
 rot:	db	$00		; rotation
 	

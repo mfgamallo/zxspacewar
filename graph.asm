@@ -15,9 +15,9 @@ delete_dw_sprite:
 	call 	delete_xy_sprite
 	ret
 	
-;;; --------------------------------------------------
+;;; -------------------------------------------------------------------------------------------
 ;;; past this point only single bytes are considered - fixed point arithmetic no longer applies
-;;; --------------------------------------------------
+;;; -------------------------------------------------------------------------------------------
 
 ;;; Paint a sprite
 ;;; A containing rotation
