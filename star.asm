@@ -1,7 +1,7 @@
 star_x:	defl	$80		; middle of the screen
 star_y:	defl	$60		; middle of the screen
 
-paint_center_star:
+paint_centre_star:
 	ld	h,star_x
 	ld	l,star_y
 	call	paint_xy_star
@@ -68,6 +68,7 @@ get_star:
 
 	pop	de		; restore state
 	ret
+
 
 star_cycle:
 	db	$00
