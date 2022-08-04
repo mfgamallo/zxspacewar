@@ -21,6 +21,13 @@ rocket_thrust:
 	ld	(vely),hl
 	ret
 
+rocket_fire:
+	ld	a,(rot)
+	ld	bc,(posx)
+	ld	de,(posy)
+	call	trp_new
+	ret
+
 rocket_paint:
 	ld	a,(rot)
 	ld	hl,(posx)

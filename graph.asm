@@ -14,6 +14,14 @@ delete_dw_sprite:
 	ld	l,d
 	call 	delete_xy_sprite
 	ret
+
+;;; Paint a dot with the position in 16bit words
+;;; HL containing X
+;;; DE containing Y
+paint_dw_dot:
+	ld	l,d
+	call	paint_xy_dot
+	ret
 	
 ;;; -------------------------------------------------------------------------------------------
 ;;; past this point only single bytes are considered - fixed point arithmetic no longer applies
@@ -104,6 +112,17 @@ dslp:	ld 	a,0		; deleting
 	djnz	dslp
 
 	pop	bc		; restore state
+	ret
+
+;;; Paint a dot
+;;; HL containing X and Y
+paint_xy_dot:
+	call	pos_to_address	; hl now points to the right byte in the screen
+	ld	a,l		; calculate shift from X
+	and	7
+	call	get_dot		; a now contains a byte with the single dot set to 1
+	ld	(hl),a
+	
 	ret
 
 ;;; Calculate the next line down
@@ -211,6 +230,34 @@ get_sprite:
 	pop	de		; restore status
 	pop	bc
 	ret
+
+;;; Get the right byte to paint a single dot a a specific point
+;;; A hold the pixel inside the byte
+;;; returns A with the right byte
+get_dot:
+	push	de		; store current state
+	push	hl
+
+	ld	hl,dots
+	ld	e,a
+	xor	a
+	ld	d,a
+	add	hl,de
+	ld	a,(hl)
+
+	pop	hl		; restore state
+	pop	de
+	ret
+
+dots:
+	db	$01
+	db	$02
+	db	$04
+	db	$08
+	db	$10
+	db	$20
+	db	$40
+	db	$80
 
 sprite:
 	dw	sprite_01

@@ -13,6 +13,11 @@ controls_read:
 	and	$01		; test for 'Q'
 	call	z,q_key_pressed
 
+	ld	bc,$7ffe
+	in	a,(c)
+	and	$01		; test for 'SPACE'
+	call	z,space_key_pressed
+
 	ret
 
 p_key_pressed:
@@ -26,3 +31,8 @@ o_key_pressed:
 q_key_pressed:
 	call	rocket_thrust
 	ret
+
+space_key_pressed:
+	call	rocket_fire
+	ret
+	
