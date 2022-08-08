@@ -8,6 +8,11 @@ trp_new:
 	push	hl		  ; save current state
 	push	ix
 
+	call	trp_allow	  ; can a new torpedo be fired?
+	cp	0
+	jp	nz,trp_na
+	call	trp_reset_interval
+
 	;; make IX point to the next free torpedo slot
 	ld	ix,trp_list 	  ; point to the beginning of the list of torpedoes
 	push	de		  ; save Y position for later
@@ -36,15 +41,46 @@ trp_new:
 	;; add	hl,de
 	;; ld	(trp_next),hl
 	;; pop	de
-	
-	pop	ix		  ; restore state
+
+trp_na:	pop	ix		  ; restore state
 	pop	hl
 	ret
+
+;;; Check if the creation of a new torpedo is allowed, that is:
+;;; - less than MAXTRP are already created
+;;; - trp_interv is zero
+;;; sets A to 0 if allowed, something else otherwise
+trp_allow:
+	ld	a,(trp_ic)
+	cp	trp_i
+	ret	p
+	xor	a
+	ret
+	
+;;; Increments the counter that limits the amount of torpedoes that can be fired in a time interval
+trp_inc:
+	call	trp_allow
+	ret	z
+	ld	a,(trp_ic)
+	inc	a
+	ld	(trp_ic),a
+	ret
+
+;;; Resets the firing interval. This happens after a new torpedo being created, and is meant to limit the number of torpedoes that can be fired in a time interval
+trp_reset_interval:
+	ld	a,$00
+	ld	(trp_ic),a
+	ret
+	
+trp_ic:	db	$00		; interval counter to limit the amount of torpedoes that can be fired in a time interval
+trp_i:	equ	$90		; interval to limit the amount of torpedoes that can be fired in a time interval
 
 trps_paint:
 	push	de                ; store current state
 	push	hl
 	push	ix
+
+	call	trp_inc		  ; increment counter to limit concurrent torpedoes
 	
 	;; TODO
 	;; Paint all the dots, and not just the first one
