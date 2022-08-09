@@ -11,18 +11,13 @@ trp_new:
 	call	trp_allow	  ; can a new torpedo be fired?
 	cp	0
 	jp	nz,trp_na
-	call	trp_reset_interval
 
 	;; make IX point to the next free torpedo slot
-	ld	ix,trp_list 	  ; point to the beginning of the list of torpedoes
-	push	de		  ; save Y position for later
-	ld	a,(trp_next)	  ; position of the first free slot in the list of torpedoes
-	ld	e,a
-	xor	a
-	ld	d,a
-	add	ix,de		  ; point to the first free torpedo slot
-	pop	de		  ; restore Y position to DE
+	call	trp_find_slot
+	jp	c,trp_na	  ; if there's no free torpedo slot return
 
+	call	trp_reset_interval
+	ld	(ix+trps),1  	  ; sets status to "in use"
 	ld	(ix+trpx),b	  ; store the X position of the new torpedo
 	ld	(ix+trpx+1),c
 	ld	(ix+trpy),d	  ; store the Y position of the new torpedo
@@ -46,9 +41,7 @@ trp_na:	pop	ix		  ; restore state
 	pop	hl
 	ret
 
-;;; Check if the creation of a new torpedo is allowed, that is:
-;;; - less than MAXTRP are already created
-;;; - trp_interv is zero
+;;; Check if the creation of a new torpedo is allowed, that is, if enough time passed since the last shot
 ;;; sets A to 0 if allowed, something else otherwise
 trp_allow:
 	ld	a,(trp_ic)
@@ -75,6 +68,29 @@ trp_reset_interval:
 trp_ic:	db	$00		; interval counter to limit the amount of torpedoes that can be fired in a time interval
 trp_i:	equ	$90		; interval to limit the amount of torpedoes that can be fired in a time interval
 
+;;; Finds a free torpedo slot. Points IX to it. If there's none sets the Carry flag
+trp_find_slot:
+	push	bc		; store current state
+	push	hl
+	
+	ld	ix,trp_list+trps	; point at the status record for the first torpedo slot
+trplp:	ld	a,(ix)
+	cp	0
+	jp	z,trpfse	; found a free slot! Return
+	ld	c,bptrp		; point to the next slot
+	ld	b,0
+	add	ix,bc
+	ld	hl,trp_end_list	; check that we're not past the end of the list
+	dec	hl
+	push	ix
+	pop	bc
+	sbc	hl,bc
+	jp	c,trpfse	; if we are, carry flag is already set. Return.
+	jp	trplp		; loop
+trpfse:	pop	hl		; restore state
+	pop	bc
+	ret
+
 trps_paint:
 	push	de                ; store current state
 	push	hl
@@ -97,18 +113,18 @@ trps_paint:
 	ret
 	
 ;;; Each torpedo needs
+;;; status: 1 byte
 ;;; X position: 2 bytes
 ;;; Y position: 2 bytes
 ;;; X velocity: 2 bytes
 ;;; Y velocity: 2 bytes
-bptrp:	equ	8
-trpx:	equ	0		; shift to X position
-trpy:	equ	2		; shift to Y position
-trpvx:	equ	4		; shift to X velocity
-trpvy:	equ	6		; shift to Y velocity
-
-trp_next:
-	db	$00		; shift to the next free torpedo slot
+bptrp:	equ	9
+trps:	equ	0		; shift to the status byte
+trpx:	equ	1		; shift to X position
+trpy:	equ	3		; shift to Y position
+trpvx:	equ	5		; shift to X velocity
+trpvy:	equ	7		; shift to Y velocity
 
 trp_list:
 	ds	MAXTRP * bptrp
+trp_end_list:
