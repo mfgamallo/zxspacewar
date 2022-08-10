@@ -26,23 +26,14 @@ trp_new:
 	;; TODO
 	;; calculate the velocity in the X and Y axis from the rotation (A) and store it
 
-	;; TODO
-	;; ensure the pointer is correctly moved to the next free slot
-	;; push up trp_next to account for the new torpedo
-	;; ld	hl,(trp_next)
-	;; push	de
-	;; xor	d
-	;; ld	e,bptrp
-	;; add	hl,de
-	;; ld	(trp_next),hl
-	;; pop	de
-
 trp_na:	pop	ix		  ; restore state
 	pop	hl
 	ret
 
 ;;; Check if the creation of a new torpedo is allowed, that is, if enough time passed since the last shot
 ;;; sets A to 0 if allowed, something else otherwise
+;;; TODO
+;;; Use C (carry) instead of A to return
 trp_allow:
 	ld	a,(trp_ic)
 	cp	trp_i
@@ -73,8 +64,8 @@ trp_find_slot:
 	push	bc		; store current state
 	push	hl
 	
-	ld	ix,trp_list+trps	; point at the status record for the first torpedo slot
-trplp:	ld	a,(ix)
+	ld	ix,trp_list	; point at the status record for the first torpedo slot
+trplp:	ld	a,(ix+trps)
 	cp	0
 	jp	z,trpfse	; found a free slot! Return
 	ld	c,bptrp		; point to the next slot
@@ -97,17 +88,27 @@ trps_paint:
 	push	ix
 
 	call	trp_inc		  ; increment counter to limit concurrent torpedoes
-	
-	;; TODO
-	;; Paint all the dots, and not just the first one
-	ld	ix,trp_list 	  ; point to the beginning of the list of torpedoes
+	ld	ix,trp_list	  ; point to the beginning of the torpedo list
+tploop:	ld	a,(ix+trps)
+	cp	0
+	jp	z,tpnext	; this torpedo is inactive don't paint it - move to the next
 	ld	h,(ix+trpx)	  ; load X
 	ld	l,(ix+trpx+1)
 	ld	d,(ix+trpy)	  ; load Y
 	ld	e,(ix+trpy+1)
 	call	paint_dw_dot
+tpnext:	ld	e,bptrp		; point to the next slot
+	ld	d,0
+	add	ix,de
+	ld	hl,trp_end_list	; check that we're not past the end of the list
+	dec	hl
+	push	ix
+	pop	de
+	sbc	hl,de
+	jp	c,tpend		; if we are, end
+	jp	tploop		; loop
 
-	pop	ix		  ; restore state
+tpend:	pop	ix		  ; restore state
 	pop	hl
 	pop	de
 	ret
