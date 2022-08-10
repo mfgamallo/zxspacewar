@@ -158,7 +158,38 @@ tpend:	pop	ix		  ; restore state
 	pop	hl
 	pop	de
 	ret
-	
+
+;;; Deletes all the active torpedoes
+trps_delete:
+	push	de                ; store current state
+	push	hl
+	push	ix
+
+	ld	ix,trp_list	  ; point to the beginning of the torpedo list
+tdloop:	ld	a,(ix+trps)
+	cp	0
+	jp	z,tdnext	  ; if this torpedo is inactive don't delete it - move to the next
+	ld	h,(ix+trpx)	  ; load X
+	ld	l,(ix+trpx+1)
+	ld	d,(ix+trpy)	  ; load Y
+	ld	e,(ix+trpy+1)
+	call	delete_dw_dot
+tdnext:	ld	e,bptrp		; point to the next slot
+	ld	d,0
+	add	ix,de
+	ld	hl,trp_end_list	; check that we're not past the end of the list
+	dec	hl
+	push	ix
+	pop	de
+	sbc	hl,de
+	jp	c,tdend		; if we are, end
+	jp	tdloop		; loop
+
+tdend:	pop	ix		  ; restore state
+	pop	hl
+	pop	de
+	ret
+
 ;;; Each torpedo needs
 ;;; status: 1 byte
 ;;; X position: 2 bytes

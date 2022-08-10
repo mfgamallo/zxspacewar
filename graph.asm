@@ -22,6 +22,15 @@ paint_dw_dot:
 	ld	l,d
 	call	paint_xy_dot
 	ret
+
+;;; Delete a dot with the position in 16bit words
+;;; HL containing X
+;;; DE containing Y
+delete_dw_dot:
+	ld	l,d
+	call	delete_xy_dot
+	ret
+
 	
 ;;; -------------------------------------------------------------------------------------------
 ;;; past this point only single bytes are considered - fixed point arithmetic no longer applies
@@ -123,9 +132,15 @@ paint_xy_dot:
 	and	7
 	call	get_dot		; a now contains a byte with the single dot set to 1
 	ld	(hl),a
-	
 	ret
 
+;;; Delete a dot
+;;; HL containing X and Y
+delete_xy_dot:
+	call	pos_to_address	; hl now points to the right byte in the screen
+	ld	(hl),0
+	ret
+	
 ;;; Calculate the next line down
 ;;; HL pointing to a point in the screen
 ;;; Return HL pointing to the point immediately down

@@ -8,6 +8,9 @@ main:	halt
 	;; delete the rocket
 	call	rocket_delete
 
+	;; delete the torpedoes
+	call	trps_delete
+
 	;; paint the star
 	call	paint_centre_star
 
