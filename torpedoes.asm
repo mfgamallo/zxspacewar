@@ -1,4 +1,4 @@
-MAXTRP:	equ	10		; maximum amount of torpedoes
+MAXTRP:	equ	10		; maximum number of torpedoes
 
 ;;; Expects
 ;;; A containing rotation
@@ -8,12 +8,13 @@ trp_new:
 	push	hl		  ; save current state
 	push	ix
 
+	ld	l,a		  ; we'll need the rotation if we really create a new torpedo
+	
 	call	trp_allow	  ; can a new torpedo be fired?
 	cp	0
 	jp	nz,trp_na
 
-	;; make IX point to the next free torpedo slot
-	call	trp_find_slot
+	call	trp_find_slot	  ; make IX point to the next free torpedo slot
 	jp	c,trp_na	  ; if there's no free torpedo slot return
 
 	call	trp_reset_interval
@@ -23,8 +24,12 @@ trp_new:
 	ld	(ix+trpy),d	  ; store the Y position of the new torpedo
 	ld	(ix+trpy+1),e
 
-	;; TODO
-	;; calculate the velocity in the X and Y axis from the rotation (A) and store it
+	ld	a,l		  ; load back the rotation into A
+	call	thrust		  ; get initial push for the torpedo
+	ld	(ix+trpvx),b	  ; store the speed in the X axis
+	ld	(ix+trpvx+1),c
+	ld	(ix+trpvy),d	  ; store the speed in the Y axis
+	ld	(ix+trpvy+1),e
 
 trp_na:	pop	ix		  ; restore state
 	pop	hl
@@ -82,6 +87,47 @@ trpfse:	pop	hl		; restore state
 	pop	bc
 	ret
 
+;;; Move all the active torpedoes according to their respective speeds
+trps_move:
+	push	de		  ; store current state
+	push	hl
+	push	ix
+
+	ld	ix,trp_list	  ; point to the beginning of the torpedo list
+tmloop:	ld	a,(ix+trps)
+	cp	0
+	jp	z,tmnext	  ; if this torpedo is inactive don't mind it - move to the next
+	ld	h,(ix+trpx)	  ; update X
+	ld	l,(ix+trpx+1)
+	ld	d,(ix+trpvx)
+	ld	e,(ix+trpvx+1)
+	add	hl,de
+	ld	(ix+trpx),h
+	ld	(ix+trpx+1),l
+	ld	h,(ix+trpy)	  ; update Y
+	ld	l,(ix+trpy+1)
+	ld	d,(ix+trpvy)
+	ld	e,(ix+trpvy+1)
+	add	hl,de
+	ld	(ix+trpy),h
+	ld	(ix+trpy+1),l
+tmnext:	ld	e,bptrp		; point to the next slot
+	ld	d,0
+	add	ix,de
+	ld	hl,trp_end_list	; check that we're not past the end of the list
+	dec	hl
+	push	ix
+	pop	de
+	sbc	hl,de
+	jp	c,tmend		; if we are, end
+	jp	tmloop		; loop
+
+tmend:	pop	ix		; restore state
+	pop	hl
+	pop	de
+	ret
+
+;;; Paints all the active torpedoes
 trps_paint:
 	push	de                ; store current state
 	push	hl
@@ -91,7 +137,7 @@ trps_paint:
 	ld	ix,trp_list	  ; point to the beginning of the torpedo list
 tploop:	ld	a,(ix+trps)
 	cp	0
-	jp	z,tpnext	; this torpedo is inactive don't paint it - move to the next
+	jp	z,tpnext	  ; if this torpedo is inactive don't paint it - move to the next
 	ld	h,(ix+trpx)	  ; load X
 	ld	l,(ix+trpx+1)
 	ld	d,(ix+trpy)	  ; load Y
@@ -128,4 +174,4 @@ trpvy:	equ	7		; shift to Y velocity
 
 trp_list:
 	ds	MAXTRP * bptrp
-trp_end_list:
+trp_end_list:			; End of the list of torpedoes

@@ -117,8 +117,9 @@ dslp:	ld 	a,0		; deleting
 ;;; Paint a dot
 ;;; HL containing X and Y
 paint_xy_dot:
+	push	hl	        ; we need the X to calculate the pixel (bit) that needs to be set
 	call	pos_to_address	; hl now points to the right byte in the screen
-	ld	a,l		; calculate shift from X
+	pop	af		; calculate shift from X
 	and	7
 	call	get_dot		; a now contains a byte with the single dot set to 1
 	ld	(hl),a
@@ -231,8 +232,8 @@ get_sprite:
 	pop	bc
 	ret
 
-;;; Get the right byte to paint a single dot a a specific point
-;;; A hold the pixel inside the byte
+;;; Get the right byte to paint a single dot at a specific point
+;;; A holds the pixel inside the byte
 ;;; returns A with the right byte
 get_dot:
 	push	de		; store current state
@@ -250,14 +251,14 @@ get_dot:
 	ret
 
 dots:
-	db	$01
-	db	$02
-	db	$04
-	db	$08
-	db	$10
-	db	$20
-	db	$40
 	db	$80
+	db	$40
+	db	$20
+	db	$10
+	db	$08
+	db	$04
+	db	$02
+	db	$01
 
 sprite:
 	dw	sprite_01

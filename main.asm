@@ -14,6 +14,9 @@ main:	halt
 	;; move the rocket
 	call	rocket_move
 
+	;; move the torpedoes
+	call	trps_move
+
 	;; paint the rocket
 	call 	rocket_paint
 
