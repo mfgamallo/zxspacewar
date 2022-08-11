@@ -26,8 +26,32 @@ trp_new:
 
 	ld	a,l		  ; load back the rotation into A
 	call	thrust		  ; get initial push for the torpedo
+	sla	c
+	rl	b
+	sla	c
+	rl	b
+	sla	c
+	rl	b
+	sla	c
+	rl	b
+	sla	c
+	rl	b
+	sla	c
+	rl	b
 	ld	(ix+trpvx),b	  ; store the speed in the X axis
 	ld	(ix+trpvx+1),c
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	sla	e
+	rl	d
 	ld	(ix+trpvy),d	  ; store the speed in the Y axis
 	ld	(ix+trpvy+1),e
 
