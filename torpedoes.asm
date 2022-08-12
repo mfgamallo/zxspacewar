@@ -125,7 +125,14 @@ tmloop:	ld	a,(ix+trps)
 	ld	l,(ix+trpx+1)
 	ld	d,(ix+trpvx)
 	ld	e,(ix+trpvx+1)
-	add	hl,de
+	;; The torpedo is out of the screen with regards to the X axis if either
+	;; D is negative and there's no carry when calculating the new positon in the X axis
+	;; D is positive and there's carry
+	xor	a		; reset A
+	add	hl,de		; calculate the new position in the X axis
+	rra			; C (carry) moved to bit 7 (sign) of the accumulator
+	xor	d		; now the accumulator's 7th bit will be 1 only if the torpedo is out of the screen
+	jp	m,tmdie		; if out of the screen, free the torpedo slot
 	ld	(ix+trpx),h
 	ld	(ix+trpx+1),l
 	ld	h,(ix+trpy)	  ; update Y
@@ -133,8 +140,15 @@ tmloop:	ld	a,(ix+trps)
 	ld	d,(ix+trpvy)
 	ld	e,(ix+trpvy+1)
 	add	hl,de
+	;; The torpedo is out of the screen with regards to the Y axis if both HL's bits 15 and 14 are set.
+	ld	a,h
+	and	$c0
+	xor	$c0
+	jp	z,tmdie
 	ld	(ix+trpy),h
 	ld	(ix+trpy+1),l
+	jp	tmnext		; move to the next slot
+tmdie:	ld	(ix+trps),0
 tmnext:	ld	e,bptrp		; point to the next slot
 	ld	d,0
 	add	ix,de
