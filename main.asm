@@ -1,5 +1,8 @@
 org 32768
 
+	;; startup
+	call	boot
+	
 main:	halt
 
 	;; read keyboard
@@ -29,6 +32,7 @@ main:	halt
 	jr 	main
 
 
+	include "boot.asm"
 	include "controls.asm"
 	include "rocket.asm"
 	include "torpedoes.asm"
