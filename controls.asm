@@ -21,18 +21,26 @@ controls_read:
 	ret
 
 p_key_pressed:
+	call	load_rocket1
 	call	rocket_rotate_right
+	call	save_rocket1
 	ret
 
 o_key_pressed:
+	call	load_rocket1
 	call	rocket_rotate_left
+	call	save_rocket1
 	ret
 
 q_key_pressed:
+	call	load_rocket1
 	call	rocket_thrust
+	call	save_rocket1
 	ret
 
 space_key_pressed:
+	call	load_rocket1
 	call	rocket_fire
+	call	save_rocket1
 	ret
 	

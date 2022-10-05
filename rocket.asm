@@ -178,13 +178,5 @@ update_posx_next:
 	ld	hl,$f000
 	ret
 
-rot:	db	$00		; rotation
-	
-posx:	dw	$8000		; range is 0 - $C000
-posy:	dw	$2000		; range is 0 - $FF00
-
-velx:	dw	$0180		; range is 0 - $FF00 (signed)
-vely:	dw	$0000		; range is 0 - $FF00 (signed)
-
 sunx:	dw	$8000
 suny:	dw	$6000
