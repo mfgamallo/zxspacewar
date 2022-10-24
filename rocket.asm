@@ -21,11 +21,32 @@ rocket_thrust:
 	ld	(vely),hl
 	ret
 
+;;; TODO make the starting position be the tip of the rocket
+;;; instead of the center
 rocket_fire:
+	push	bc		; store current state
+	push	de
+	push	hl
+	
 	ld	a,(rot)
-	ld	bc,(posx)
-	ld	de,(posy)
+
+	ld	hl,(posx)
+	ld	bc,$0800
+	add	hl,bc
+	ld	b,h
+	ld	c,l
+
+	ld	hl,(posy)
+	ld	de,$0800
+	add	hl,de
+	ld	d,h
+	ld	e,l
+
 	call	trp_new
+
+	pop	hl		; restore state
+	pop	de
+	pop	bc
 	ret
 
 rocket_paint:
