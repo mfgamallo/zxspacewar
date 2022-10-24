@@ -18,11 +18,15 @@ trp_new:
 	jp	c,trp_na	  ; if there's no free torpedo slot return
 
 	call	trp_reset_interval
-	ld	(ix+trps),1  	  ; sets status to "in use"
+	ld	(ix+trps),3  	  ; set both bit0 and bit1
 	ld	(ix+trpx),b	  ; store the X position of the new torpedo
 	ld	(ix+trpx+1),c
+	ld	(ix+trpox),b	  ; update the old X position too to avoid artifacts
+	ld	(ix+trpox+1),c
 	ld	(ix+trpy),d	  ; store the Y position of the new torpedo
 	ld	(ix+trpy+1),e
+	ld	(ix+trpoy),d	  ; update the old Y position too to avoid artifacts
+	ld	(ix+trpoy+1),e
 
 	ld	a,l		  ; load back the rotation into A
 	call	thrust		  ; get initial push for the torpedo
@@ -119,10 +123,14 @@ trps_move:
 
 	ld	ix,trp_list	  ; point to the beginning of the torpedo list
 tmloop:	ld	a,(ix+trps)
+	and	1		; select the "alive" bit
 	cp	0
 	jp	z,tmnext	  ; if this torpedo is inactive don't mind it - move to the next
-	ld	h,(ix+trpx)	  ; update X
+	;; Update X ensuring its current value is preserved in old X
+	ld	h,(ix+trpx)
 	ld	l,(ix+trpx+1)
+	ld	(ix+trpox),h
+	ld	(ix+trpox+1),l
 	ld	d,(ix+trpvx)
 	ld	e,(ix+trpvx+1)
 	;; The torpedo is out of the screen with regards to the X axis if either
@@ -135,8 +143,11 @@ tmloop:	ld	a,(ix+trps)
 	jp	m,tmdie		; if out of the screen, free the torpedo slot
 	ld	(ix+trpx),h
 	ld	(ix+trpx+1),l
-	ld	h,(ix+trpy)	  ; update Y
+	;; Update Y ensuring its current value is preserved in old Y
+	ld	h,(ix+trpy)
 	ld	l,(ix+trpy+1)
+	ld	(ix+trpoy),h
+	ld	(ix+trpoy+1),l
 	ld	d,(ix+trpvy)
 	ld	e,(ix+trpvy+1)
 	add	hl,de
@@ -148,7 +159,7 @@ tmloop:	ld	a,(ix+trps)
 	ld	(ix+trpy),h
 	ld	(ix+trpy+1),l
 	jp	tmnext		; move to the next slot
-tmdie:	ld	(ix+trps),0
+tmdie:	ld	(ix+trps),2	; leave bit1 set
 tmnext:	ld	e,bptrp		; point to the next slot
 	ld	d,0
 	add	ix,de
@@ -174,6 +185,7 @@ trps_paint:
 	call	trp_inc		  ; increment counter to limit concurrent torpedoes
 	ld	ix,trp_list	  ; point to the beginning of the torpedo list
 tploop:	ld	a,(ix+trps)
+	and	1		; select the "alive" bit
 	cp	0
 	jp	z,tpnext	  ; if this torpedo is inactive don't paint it - move to the next
 	ld	h,(ix+trpx)	  ; load X
@@ -212,6 +224,15 @@ tdloop:	ld	a,(ix+trps)
 	ld	d,(ix+trpy)	  ; load Y
 	ld	e,(ix+trpy+1)
 	call	delete_dw_dot
+	ld	h,(ix+trpox)	  ; load old X
+	ld	l,(ix+trpox+1)
+	ld	d,(ix+trpoy)	  ; load old Y
+	ld	e,(ix+trpoy+1)
+	call	delete_dw_dot
+	ld	a,(ix+trps)
+	and	1		; select "alive" bit
+	jp	nz,tdnext	; if the torpedo is alive move on
+	ld	(ix+trps),0	; if not reset every bit
 tdnext:	ld	e,bptrp		; point to the next slot
 	ld	d,0
 	add	ix,de
@@ -230,16 +251,22 @@ tdend:	pop	ix		  ; restore state
 
 ;;; Each torpedo needs
 ;;; status: 1 byte
+;;; 	bit0: alive
+;;; 	bit1: still needs to be deleted from the screen
 ;;; X position: 2 bytes
 ;;; Y position: 2 bytes
+;;; old X position: 2 bytes
+;;; old Y position: 2 bytes
 ;;; X velocity: 2 bytes
 ;;; Y velocity: 2 bytes
-bptrp:	equ	9
+bptrp:	equ	13
 trps:	equ	0		; shift to the status byte
 trpx:	equ	1		; shift to X position
 trpy:	equ	3		; shift to Y position
-trpvx:	equ	5		; shift to X velocity
-trpvy:	equ	7		; shift to Y velocity
+trpox:	equ	5		; shift to old X position
+trpoy:	equ	7		; shift to old Y position
+trpvx:	equ	9		; shift to X velocity
+trpvy:	equ	11		; shift to Y velocity
 
 trp_list:
 	ds	MAXTRP * bptrp

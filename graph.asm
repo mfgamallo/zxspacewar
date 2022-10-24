@@ -171,7 +171,7 @@ pos_to_address:
 	rra
 	rra
 	and	24
-	or	64
+	or	192
 	ld	h,a
 	ld	a,c
 	and	7
