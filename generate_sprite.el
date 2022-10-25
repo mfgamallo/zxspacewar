@@ -83,6 +83,27 @@
 	)
       )
 
+(setq explosion-model
+      '(
+	("1000000100000000"
+	 "0100000110000000"
+	 "0111001110000100"
+	 "0111111111011000"
+	 "0111111111111000"
+	 "0011111111110000"
+	 "0011111111111000"
+	 "0001111111111100"
+	 "0011111111111000"
+	 "0001111111110000"
+	 "0001111111111000"
+	 "0000111111111000"
+	 "0000111111111100"
+	 "0001001111100110"
+	 "0000000111000001"
+	 "0000000010000000")
+	)
+      )
+
 (defun generate-all (models)
   (let ((result ""))
     ;; first quadrant (go through the list, generate all)
@@ -162,5 +183,5 @@
   (set-buffer "*scratch*")
   (insert text))
 
-(let ((text (generate-all models)))
+(let ((text (generate-all explosion-model)))
   (send-to-scratch text))

@@ -50,10 +50,15 @@ rocket_fire:
 	ret
 
 rocket_paint:
-	ld	a,(rot)
 	ld	hl,(posx)
 	ld	de,(posy)
+	ld	a,(rktsts)
+	and	a
+	jp	nz,rpexpl
+	ld	a,(rot)
 	call 	paint_dw_sprite
+	ret
+rpexpl:	call 	paint_dw_explosion
 	ret
 
 rocket_delete:
