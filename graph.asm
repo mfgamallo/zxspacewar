@@ -66,15 +66,18 @@ paint_sprite:
 	push	bc		; store current state
 	ld	b,16		; the sprite is 16 lines high
 	
-pslp:	ld 	a,(hl)		; get one byte
+pslp:	ld	a,(de)		; get one byte from the screen
+	or 	(hl)		; or it with a byte from the sprite
 	ld	(de),a		; put in on the screen
 	inc	hl		; next byte
 	inc	e		; next column
-	ld	a,(hl)
+	ld	a,(de)
+	or	(hl)
 	ld	(de),a
 	inc	hl
 	inc	e
-	ld	a,(hl)
+	ld	a,(de)
+	or	(hl)
 	ld	(de),a
 	inc	hl
 	
@@ -193,7 +196,7 @@ pos_to_address:
 	pop	bc		; restore state
 	ret
 
-;;; Gets the sprite properly rotated
+;;; Get the sprite properly rotated
 ;;; A containing rotation
 ;;; Returns HL pointing to the rotated sprite group
 rotate_sprite:
