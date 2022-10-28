@@ -176,6 +176,44 @@ tmend:	pop	ix		; restore state
 	pop	de
 	ret
 
+;;; Check if *any* of the currently alive torpedoes collides with the provided 16x16 sprite
+;;; HL contains the X and Y coordinates of the top left corner of the 16x16 sprite
+;;; The carry flag is set if there's collision, and it's reset otherwise
+trps_collision:
+	push	bc		; store current state
+	push	de
+	push	ix
+
+	ld	b,h
+	ld	c,l
+	ld	ix,trp_list	; point to the beginning of the torpedo list
+tcloop:	ld	a,(ix+trps)
+	and	1		; select the "alive" bit
+	cp	0
+	jp	z,tcnext	; if this torpedo is inactive don't mind it - move to the next
+	ld	d,(ix+trpx)	; check collisions
+	ld	e,(ix+trpy)
+	ld	h,b
+	ld	l,c
+	call	col_contains
+	jp	c,tcend		; if a collision is detected end with carry
+tcnext:	ld	e,bptrp		; point to the next slot
+	ld	d,0
+	add	ix,de
+	ld	hl,trp_end_list	; check that we're not past the end of the list
+	dec	hl
+	push	ix
+	pop	de
+	sbc	hl,de
+	jp	c,tcndnc	; if we are, end
+	jp	tcloop		; loop
+
+tcndnc:	xor	a		; no collisions - clear carry flag
+tcend:	pop	ix		; restore state
+	pop	de
+	pop	bc
+	ret
+	
 ;;; Paints all the active torpedoes
 trps_paint:
 	push	de                ; store current state
