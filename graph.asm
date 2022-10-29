@@ -160,12 +160,19 @@ dslp:	ld 	a,0		; deleting
 ;;; Paint a dot
 ;;; HL containing X and Y
 paint_xy_dot:
+	push	bc		; store current state
+	
 	push	hl	        ; we need the X to calculate the pixel (bit) that needs to be set
 	call	pos_to_address	; hl now points to the right byte in the screen
 	pop	af		; calculate shift from X
 	and	7
 	call	get_dot		; a now contains a byte with the single dot set to 1
+	ld	b,a
+	ld	a,(hl)
+	or	b
 	ld	(hl),a
+
+	pop	bc		; restore state
 	ret
 
 ;;; Delete a dot
