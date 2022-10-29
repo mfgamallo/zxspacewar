@@ -1,4 +1,22 @@
 controls_read:
+	ld	bc,$fbfe
+	in	a,(c)
+	ld	b,a
+	and	$01		; test for 'Q'
+	call	z,q_key_pressed
+	ld	a,b
+	and	$10		; test for 'T'
+	call	z,t_key_pressed
+
+	ld	bc,$fdfe
+	in	a,(c)
+	ld	b,a
+	and	$08		; test for 'F'
+	call	z,f_key_pressed
+	ld	a,b
+	and	$10		; test for 'G'
+	call	z,g_key_pressed
+
 	ld	bc,$dffe
 	in	a,(c)
 	ld	b,a
@@ -8,10 +26,10 @@ controls_read:
 	and	$02		; test for 'O'
 	call	z,o_key_pressed
 	
-	ld	bc,$fbfe
+	ld	bc,$bffe
 	in	a,(c)
-	and	$01		; test for 'Q'
-	call	z,q_key_pressed
+	and	$10		; test for 'H'
+	call	z,h_key_pressed
 
 	ld	bc,$7ffe
 	in	a,(c)
@@ -44,3 +62,26 @@ space_key_pressed:
 	call	save_rocket1
 	ret
 	
+h_key_pressed:
+	call	load_rocket2
+	call	rocket_rotate_right
+	call	save_rocket2
+	ret
+
+f_key_pressed:
+	call	load_rocket2
+	call	rocket_rotate_left
+	call	save_rocket2
+	ret
+
+t_key_pressed:
+	call	load_rocket2
+	call	rocket_thrust
+	call	save_rocket2
+	ret
+
+g_key_pressed:
+	call	load_rocket2
+	call	rocket_fire
+	call	save_rocket2
+	ret
