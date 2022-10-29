@@ -12,7 +12,7 @@ rocket2_posx:	dw	$8000
 rocket2_posy:	dw	$a000
 rocket2_velx:	dw	$fe70
 rocket2_vely:	dw	$0000
-rocket2_rktsts:	db	$00
+rocket2_rktsts:	db	$02
 
 ;;; We keep these so we can delete them even after switching the
 ;;; screen buffer - we don't want to have to delete the whole
@@ -29,7 +29,7 @@ old_rocket2_posx:	dw	$8000
 old_rocket2_posy:	dw	$a000
 old_rocket2_velx:	dw	$fe70
 old_rocket2_vely:	dw	$0000
-old_rocket2_rktsts:	db	$00
+old_rocket2_rktsts:	db	$02
 
 load_rocket1:
 	push	bc		; store current state
@@ -155,10 +155,13 @@ save_old_rocket2:
 ;;; Current rocket
 rot:	db	$00		; rotation
 	
-posx:	dw	$8000		; range is 0 - $C000
-posy:	dw	$2000		; range is 0 - $FF00
+posx:	dw	$0000		; range is 0 - $C000
+posy:	dw	$0000		; range is 0 - $FF00
 
-velx:	dw	$0180		; range is 0 - $FF00 (signed)
+velx:	dw	$0000		; range is 0 - $FF00 (signed)
 vely:	dw	$0000		; range is 0 - $FF00 (signed)
 
-rktsts:	db	$00		; status: 0: alive, 1: hit
+;;; status:
+;;;   bit0: 0=alive, 1=hit
+;;;   bit1: 0=rocket1, 1=rocket2
+rktsts:	db	$00

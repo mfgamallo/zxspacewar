@@ -4,11 +4,12 @@ MAXTRP:	equ	10		; maximum number of torpedoes
 ;;; A containing rotation
 ;;; BC containing X position
 ;;; DE containing Y position
+;;; L contains the rocket status
 trp_new:
 	push	hl		  ; save current state
 	push	ix
 
-	ld	l,a		  ; we'll need the rotation if we really create a new torpedo
+	ld	h,a		  ; we'll need the rotation if we really create a new torpedo
 	
 	call	trp_allow	  ; can a new torpedo be fired?
 	cp	0
@@ -18,7 +19,11 @@ trp_new:
 	jp	c,trp_na	  ; if there's no free torpedo slot return
 
 	call	trp_reset_interval
-	ld	(ix+trps),3  	  ; set both bit0 and bit1
+	ld	a,l	     	  ; bit1 in the rocket status byte means rocker1/rocket2
+	and	2		  ; select said bit1
+	sla	a		  ; shift to the left, as in the torpedo status byte the rocket ID is in bit2
+	or	3		  ; set both bit0 and bit1 (regular live torpedo)
+	ld	(ix+trps),a
 	ld	(ix+trpx),b	  ; store the X position of the new torpedo
 	ld	(ix+trpx+1),c
 	ld	(ix+trpox),b	  ; update the old X position too to avoid artifacts
@@ -28,7 +33,7 @@ trp_new:
 	ld	(ix+trpoy),d	  ; update the old Y position too to avoid artifacts
 	ld	(ix+trpoy+1),e
 
-	ld	a,l		  ; load back the rotation into A
+	ld	a,h		  ; load back the rotation into A
 	call	thrust		  ; get initial push for the torpedo
 	sla	c
 	rl	b
@@ -176,7 +181,8 @@ tmend:	pop	ix		; restore state
 	pop	de
 	ret
 
-;;; Check if *any* of the currently alive torpedoes collides with the provided 16x16 sprite
+;;; Check if *any* of the currently alive torpedoes with the right rocket ID collides with the provided 16x16 sprite
+;;; A contains the rocket status byte
 ;;; HL contains the X and Y coordinates of the top left corner of the 16x16 sprite
 ;;; The carry flag is set if there's collision, and it's reset otherwise
 trps_collision:
@@ -184,13 +190,26 @@ trps_collision:
 	push	de
 	push	ix
 
+	ld	(tcrst),a
 	ld	b,h
 	ld	c,l
 	ld	ix,trp_list	; point to the beginning of the torpedo list
 tcloop:	ld	a,(ix+trps)
+	ld	h,a		; will be used to check if this torpedo can hurt this rocket
 	and	1		; select the "alive" bit
 	cp	0
 	jp	z,tcnext	; if this torpedo is inactive don't mind it - move to the next
+	;; Let's check if this torpedo can hurt this rocket.
+	;; The torpedo was fired by a rocket identified by bit2 in the torpedo status byte
+	;; The current rocket is identified by bit1 in the rocket status byte
+	ld	a,(tcrst)
+	and	2		; select bit1 of the rocket status byte
+	sla	a		; shift to the left so it's comparable with bit2 from the torpedo status byte
+	ld	l,a
+	ld	a,h
+	and	4		; select bit2 of the torpedo status byte
+	xor	l
+	jp	z,tcnext	; if this torpedo can't hurt this rocket move on the the next torpedo
 	ld	d,(ix+trpx)	; check collisions
 	ld	e,(ix+trpy)
 	ld	h,b
@@ -213,6 +232,7 @@ tcend:	pop	ix		; restore state
 	pop	de
 	pop	bc
 	ret
+tcrst:	db	$00
 	
 ;;; Paints all the active torpedoes
 trps_paint:
@@ -291,6 +311,7 @@ tdend:	pop	ix		  ; restore state
 ;;; status: 1 byte
 ;;; 	bit0: alive
 ;;; 	bit1: still needs to be deleted from the screen
+;;; 	bit2: rocket that fired this torpedo: 0=rocket1, 1=rocket2
 ;;; X position: 2 bytes
 ;;; Y position: 2 bytes
 ;;; old X position: 2 bytes

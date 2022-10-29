@@ -28,8 +28,6 @@ rocket_fire:
 	push	de
 	push	hl
 	
-	ld	a,(rot)
-
 	ld	hl,(posx)
 	ld	bc,$0800
 	add	hl,bc
@@ -42,6 +40,11 @@ rocket_fire:
 	ld	d,h
 	ld	e,l
 
+	ld	a,(rktsts)
+	ld	l,a
+
+	ld	a,(rot)
+
 	call	trp_new
 
 	pop	hl		; restore state
@@ -53,7 +56,7 @@ rocket_paint:
 	ld	hl,(posx)
 	ld	de,(posy)
 	ld	a,(rktsts)
-	and	a
+	and	1
 	jp	nz,rpexpl
 	ld	a,(rot)
 	call 	paint_dw_sprite

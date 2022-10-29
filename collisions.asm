@@ -30,9 +30,11 @@ col_rocket:
 	ld	h,a
 	ld	a,(posy+1)
 	ld	l,a
+	ld	a,(rktsts)
 	call	trps_collision
 	jp	nc,crnoco
-	ld	a,$01
+	ld	a,(rktsts)
+	or	1
 	ld	(rktsts),a
 
 crnoco:	pop	hl		; restore state
