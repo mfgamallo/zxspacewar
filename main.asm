@@ -7,7 +7,8 @@ org 32768
 	;; startup
 	call	boot
 
-main:	halt
+main_loop:
+	halt
 
 	;; switch screen buffer
 	call	switch
@@ -68,9 +69,45 @@ main:	halt
 	;; paint the torpedoes
 	call	trps_paint
 
-	jr 	main
-
+	;; Finish if any of the rockets is hit
+	call	col_check_rockets
+	jp	c,main_collision
 	
+	jp 	main_loop
+
+main_collision:
+	call	exps_reset
+main_collision_loop:	
+	halt
+
+	;; switch screen buffer
+	call	switch
+
+	;; delete the rocket 1
+	call	load_rocket1
+	call	rocket_delete
+
+	;; delete the old rocket 1
+	call	load_old_rocket1
+	call	rocket_delete
+
+	;; delete the rocket 2
+	call	load_rocket2
+	call	rocket_delete
+
+	;; delete the old rocket 2
+	call	load_old_rocket2
+	call	rocket_delete
+
+	;; delete the torpedoes
+	call	trps_delete
+
+	;; paint and animate the explosion(s)
+	call	exps_paint
+
+	jp	main_collision_loop
+
+;;; includes
 	include "boot.asm"
 	include "screen.asm"
 	include "controls.asm"
@@ -78,6 +115,7 @@ main:	halt
 	include "rockets.asm"
 	include "torpedoes.asm"
 	include "star.asm"
+	include "explosions.asm"
 	include "collisions.asm"
 	include "math.asm"
 	include "newton.asm"

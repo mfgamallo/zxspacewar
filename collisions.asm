@@ -96,3 +96,16 @@ crsco:	ld	a,(rocket1_rktsts)
 	or	1
 	ld	(rocket2_rktsts),a
 	ret
+
+;;; Sets the carry flag if any of the rockets is hit. Resets it otherwise.
+col_check_rockets:
+	ld	a,(rocket1_rktsts) 	; check if rocket1 is hit
+	and	1			; select bit0
+	jp	nz,ccrhit
+	ld	a,(rocket2_rktsts) 	; check if rocket2 is hit
+	and	1			; select bit0
+	jp	nz,ccrhit
+	xor a
+	ret
+ccrhit:	scf
+	ret

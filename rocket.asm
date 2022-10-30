@@ -65,13 +65,8 @@ rocket_fire:
 rocket_paint:
 	ld	hl,(posx)
 	ld	de,(posy)
-	ld	a,(rktsts)
-	and	1
-	jp	nz,rpexpl
 	ld	a,(rot)
 	call 	paint_dw_sprite
-	ret
-rpexpl:	call 	paint_dw_explosion
 	ret
 
 rocket_delete:
