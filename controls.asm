@@ -1,28 +1,28 @@
 controls_read:
 	ld	bc,$fbfe
 	in	a,(c)
-	ld	b,a
 	and	$01		; test for 'Q'
 	call	z,q_key_pressed
-	ld	a,b
+	ld	bc,$fbfe
+	in	a,(c)
 	and	$10		; test for 'T'
 	call	z,t_key_pressed
 
 	ld	bc,$fdfe
 	in	a,(c)
-	ld	b,a
 	and	$08		; test for 'F'
 	call	z,f_key_pressed
-	ld	a,b
+	ld	bc,$fdfe
+	in	a,(c)
 	and	$10		; test for 'G'
 	call	z,g_key_pressed
 
 	ld	bc,$dffe
 	in	a,(c)
-	ld	b,a
 	and	$01		; test por 'P'
 	call	z,p_key_pressed
-	ld	a,b
+	ld	bc,$dffe
+	in	a,(c)
 	and	$02		; test for 'O'
 	call	z,o_key_pressed
 	

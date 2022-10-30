@@ -26,14 +26,46 @@ ccno:	xor	a		; carry flag reset
 col_rocket:
 	push	hl		; store current state
 
+	;; check for collisions with torpedoes
 	ld	a,(posx+1)
 	ld	h,a
 	ld	a,(posy+1)
 	ld	l,a
 	ld	a,(rktsts)
 	call	trps_collision
-	jp	nc,crnoco
-	ld	a,(rktsts)
+	jp	c,crco
+	;; check for collisions with the central star
+	ld	a,(posx+1)	; upper left corner
+	ld	h,a
+	ld	a,(posy+1)
+	ld	l,a
+	ld	a,star_x
+	ld	d,a
+	ld	a,star_y
+	ld	e,a
+	call	col_contains
+	jp	c,crco
+	ld	a,star_x+16	; upper right corner
+	ld	d,a
+	ld	a,star_y
+	ld	e,a
+	call	col_contains
+	jp	c,crco
+	ld	a,star_x	; lower left corner
+	ld	d,a
+	ld	a,star_y=16
+	ld	e,a
+	call	col_contains
+	jp	c,crco
+	ld	a,star_x+16	; lower right corner
+	ld	d,a
+	ld	a,star_y+16
+	ld	e,a
+	call	col_contains
+	jp	c,crco
+	
+	jp	crnoco		; no collisions
+crco:	ld	a,(rktsts)
 	or	1
 	ld	(rktsts),a
 
