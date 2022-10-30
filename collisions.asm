@@ -24,8 +24,6 @@ ccno:	xor	a		; carry flag reset
 
 ;;; Explodes the current rocket if there's collision
 col_rocket:
-	push	hl		; store current state
-
 	;; check for collisions with torpedoes
 	ld	a,(posx+1)
 	ld	h,a
@@ -35,39 +33,63 @@ col_rocket:
 	call	trps_collision
 	jp	c,crco
 	;; check for collisions with the central star
-	ld	a,(posx+1)	; upper left corner
+	ld	a,(posx+1)
 	ld	h,a
 	ld	a,(posy+1)
 	ld	l,a
-	ld	a,star_x
-	ld	d,a
-	ld	a,star_y
-	ld	e,a
+	ld	d,star_x	; upper left corner
+	ld	e,star_y
 	call	col_contains
 	jp	c,crco
-	ld	a,star_x+16	; upper right corner
-	ld	d,a
-	ld	a,star_y
-	ld	e,a
+	ld	d,star_x+16	; upper right corner
 	call	col_contains
 	jp	c,crco
-	ld	a,star_x	; lower left corner
-	ld	d,a
-	ld	a,star_y=16
-	ld	e,a
+	ld	e,star_y+16	; lower right corner
 	call	col_contains
 	jp	c,crco
-	ld	a,star_x+16	; lower right corner
-	ld	d,a
-	ld	a,star_y+16
-	ld	e,a
+	ld	d,star_x	; lower left corner
 	call	col_contains
 	jp	c,crco
 	
-	jp	crnoco		; no collisions
+	ret			; no collisions
 crco:	ld	a,(rktsts)
 	or	1
 	ld	(rktsts),a
+	ret
 
-crnoco:	pop	hl		; restore state
+;;; Explodes rockets if they bump into each other
+col_rockets:
+	ld	a,(rocket1_posx+1)
+	ld	h,a
+	ld	a,(rocket1_posy+1)
+	ld	l,a
+	ld	a,(rocket2_posx+1)	; upper left corner
+	ld	d,a
+	ld	a,(rocket2_posy+1)
+	ld	e,a
+	call	col_contains
+	jp	c,crsco
+	ld	a,d			; upper right corner
+	add	a,16
+	ld	d,a
+	call	col_contains
+	jp	c,crsco
+	ld	a,e			; lower right corner
+	add	a,16
+	ld	e,a
+	call	col_contains
+	jp	c,crsco
+	ld	a,d			; lower left corner
+	sub	16
+	ld	d,a
+	call	col_contains
+	jp	c,crsco
+	
+	ret				; no collisions
+crsco:	ld	a,(rocket1_rktsts)
+	or	1
+	ld	(rocket1_rktsts),a
+	ld	a,(rocket2_rktsts)
+	or	1
+	ld	(rocket2_rktsts),a
 	ret
