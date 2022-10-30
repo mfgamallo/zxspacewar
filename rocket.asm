@@ -11,6 +11,9 @@ rocket_rotate_right:
 	ret
 
 rocket_thrust:
+	push	bc		; save current state
+	push	de
+	
 	ld	a,(rot)
 	call	thrust
 	ld	hl,(velx)
@@ -19,6 +22,9 @@ rocket_thrust:
 	ld	hl,(vely)
 	add	hl,de
 	ld	(vely),hl
+
+	pop	de		; restore state
+	pop	bc
 	ret
 
 ;;; TODO make the starting position be the tip of the rocket
