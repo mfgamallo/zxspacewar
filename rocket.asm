@@ -1,3 +1,7 @@
+;;; rocket.asm
+;;; Rocket actions and movements.
+;;; TODO: Separation between this file and graph.asm is not resolved properly
+	
 rocket_rotate_left:
 	ld	a,(rot)
 	dec	a

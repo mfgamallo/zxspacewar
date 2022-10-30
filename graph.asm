@@ -1,3 +1,7 @@
+;;; graph.asm
+;;; Painting routines.
+;;; TODO: This file still contains the rocket sprites and its ancillary routines.
+
 ;;; Paint a sprite with the position in 16bit words
 ;;; A containing rotation
 ;;; HL containing X

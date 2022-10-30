@@ -1,3 +1,6 @@
+;;; torpedoes.asm
+;;; Torpedo stuff: creating new torpedoes, keeping track of already created ones...
+	
 MAXTRP:	equ	10		; maximum number of torpedoes
 
 ;;; Expects

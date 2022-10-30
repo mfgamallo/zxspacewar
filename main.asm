@@ -1,3 +1,7 @@
+;;; main.asm
+;;; Game's main loop
+;;; Includes every other asm file
+
 org 32768
 
 	;; startup

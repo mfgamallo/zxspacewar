@@ -1,3 +1,6 @@
+;;; controls.asm
+;;; Input control
+	
 controls_read:
 	ld	bc,$fbfe
 	in	a,(c)

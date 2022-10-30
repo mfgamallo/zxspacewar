@@ -1,3 +1,6 @@
+;;; screen.asm
+;;; Screen routines: border, clear screen, switch buffer...
+
 BLACK_BORDER	equ	0
 WHITE_ON_BLACK	equ	$7	
 	

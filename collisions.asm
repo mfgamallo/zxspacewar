@@ -1,3 +1,6 @@
+;;; collisions.asm
+;;; Collision detection
+	
 ;;; Checks if a point is contained within a rectangle (borders included)
 ;;; DE contains the coordinates of the point
 ;;; HL contains the coordinates of the top-left corner of a 16x16 rectangle

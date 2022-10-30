@@ -1,7 +1,8 @@
-;;; Multiply two 16bit numbers
-;;; HL and DE contain the factors
-
-;;; Taken from http://z80-heaven.wikidot.com/advanced-math
+;;; math.asm
+;;; Mathematical operations
+;;; NOTICE I've shamelessly adapted code from othe places.
+	
+;;; Adapted from http://z80-heaven.wikidot.com/advanced-math
 mul8:
 ;;; Inputs:
 ;;;  H and E
@@ -9,11 +10,6 @@ mul8:
 ;;;  HL is the product
 ;;;  D is 0
 ;;;  A,E,B,C are preserved
-;36 bytes
-;min: 190cc
-;max: 242cc
-;avg: 216cc
-
 	ld	d,0
 	ld	l,d
 	sla	h
@@ -42,16 +38,9 @@ mul8:
 	add 	hl,de
 	ret
 	
-;;; Taken from https://github.com/Zeda/z80float/blob/master/common/mul16.z80
-;;; This was made by Runer112
-;;; Tested by jacobly
+;;; Adapted from https://github.com/Zeda/z80float/blob/master/common/mul16.z80
 mul16:
 ;;; BC*DE --> DEHL
-;;; ~544.887cc as calculated in jacobly's test
-;;; min: 214cc  (DE = 1)
-;;; max: 667cc
-;;; avg: 544.4507883cc   however, deferring to jacobly's result as mine may have math issues ?
-;;; 177 bytes
 	ld	a,d
 	ld	d,0
 	ld	h,b
@@ -212,7 +201,7 @@ mulfixed8_8:
 	pop 	bc		; restore status
 	ret
 	
-;;; Taken from http://z80-heaven.wikidot.com/advanced-math
+;;; Adapted from http://z80-heaven.wikidot.com/advanced-math
 mulfixed8_8_unsafe:
 ;;; Multiplies H.L by D.E, stores the result in H.L
 ;;; First, find out if the output is positive or negative
@@ -266,18 +255,12 @@ mulfixed8_8_lbl3:
 	ld h,a
 	ret
 
-;;; Taken form http://z80-heaven.wikidot.com/advanced-math#toc32
+;;; Adapted form http://z80-heaven.wikidot.com/advanced-math#toc32
 BC_Div_DE_88:
 ;; ;Inputs:
 ;;; DE,BC are 8.8 Fixed Point numbers
 ;;; Outputs:
 ;;; DE is the 8.8 Fixed Point result (rounded to the least significant bit)
-;;; if DE is 0 : 122cc or 136cc if BC is negative
-;;; if |BC|>=128*|DE| : 152cc or 166cc if BC is negative
-;;; Otherwise:
-;;; min: 1107cc
-;;; max: 1319cc
-;;; avg: 1201cc
 
 ;;; First, find out if the output is positive or negative
 	ld a,b
@@ -355,9 +338,6 @@ div_fixed88_overflow:
 	ret
 
 div_fixed88_sub:
-;;; min: 456cc
-;;; max: 536cc
-;;; avg: 496cc
 	ld b,8
 BC_Div_DE_88_lbl3:
 	rla

@@ -1,3 +1,6 @@
+;;; newton.asm
+;;; Acceleration routines. Sine and cosine tables.
+	
 ;;; Simplified acceleration
 ;;; Currently both masses are 1 :-P
 ;;; IX pointing to accel_args

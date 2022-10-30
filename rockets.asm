@@ -1,3 +1,6 @@
+;;; rockets.asm
+;;; Distinction between the two rockets in the game
+	
 ROCKET_RECORD_SIZE	equ	$000a
 
 rocket1_rot:	db	$00

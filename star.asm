@@ -1,3 +1,6 @@
+;;; star.asm
+;;; Star at the center of the game. Rotate between its different sprites to animate it.
+	
 star_x:	defl	$80		; middle of the screen
 star_y:	defl	$60		; middle of the screen
 
