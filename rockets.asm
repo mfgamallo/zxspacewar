@@ -3,7 +3,7 @@
 	
 ROCKET_RECORD_SIZE	equ	$000a
 
-rocket1_rot:	db	$00
+rocket1_rot:	db	$80
 rocket1_posx:	dw	$8000
 rocket1_posy:	dw	$2000
 rocket1_velx:	dw	$0180
