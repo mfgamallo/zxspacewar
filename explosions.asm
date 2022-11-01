@@ -1,30 +1,31 @@
 ;;; explosions.asm
 ;;; Regarding what happens when a rocket is hit
 
+NUM_SPRITES:	equ	8
+	
 ;;; Reset the explosion counters
 exps_reset:
-	;; ld	a,(exp_rocket1_sprite_count)
-	;; inc	a
-	;; ld	(exp_rocket1_sprite_count),a
-	;; ld	a,(exp_rocket2_sprite_count)
-	;; inc	a
-	;; ld	(exp_rocket2_sprite_count),a
+	xor	a
+	ld	(exp_sprite_count),a
 	ret
 	
 ;;; Check if any of the rockets is hit and paint explosions if they are.
+;;; Sets the carry flag if it already cycled through all the explosion sprites
 exps_paint:
-	ld	a,(rocket1_rktsts) 	; check if rocket1 is hit
+	ld	a,(exp_sprite_count) 	; check if there's no more explosion sprites
+	sub	NUM_SPRITES
+	jp	c,esptc
+	scf
+	ret
+esptc:	ld	a,(rocket1_rktsts) 	; check if rocket1 is hit
 	and	1			; select bit0
 	jp	z,espr1n		; if hit, paint explosion
 	ld	a,(rocket1_posx+1)
 	ld	h,a
 	ld	a,(rocket1_posy+1)
 	ld	l,a
-	ld	a,(exp_rocket1_sprite_count)
+	ld	a,(exp_sprite_count)
 	call	exp_paint
-	ld	a,(exp_rocket1_sprite_count)
-	inc	a
-	ld	(exp_rocket1_sprite_count),a
 espr1n:	ld	a,(rocket2_rktsts) 	; check if rocket2 is hit
 	and	1			; select bit0
 	jp	z,espend		; if hit, paint explosion
@@ -32,14 +33,14 @@ espr1n:	ld	a,(rocket2_rktsts) 	; check if rocket2 is hit
 	ld	h,a
 	ld	a,(rocket2_posy+1)
 	ld	l,a
-	ld	a,(exp_rocket2_sprite_count)
+	ld	a,(exp_sprite_count)
 	call	exp_paint
-	ld	a,(exp_rocket2_sprite_count)
+espend:	ld	a,(exp_sprite_count)
 	inc	a
-	ld	(exp_rocket2_sprite_count),a
-espend:	ret
-exp_rocket1_sprite_count:	db	$00
-exp_rocket2_sprite_count:	db	$00
+	ld	(exp_sprite_count),a
+	xor	a
+	ret
+exp_sprite_count:	db	$00
 
 ;;; Paint an explosion sprite
 ;;; HL contains the X and Y coordinates of the explosion

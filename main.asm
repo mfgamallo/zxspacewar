@@ -2,7 +2,7 @@
 ;;; Game's main loop
 ;;; Includes every other asm file
 
-org 32768
+org $7000
 
 	;; startup
 	call	boot
@@ -121,4 +121,4 @@ main_collision_loop:
 	include "newton.asm"
 	include	"graph.asm"
 	
-end 32768
+end $7000
