@@ -7,7 +7,7 @@ org $7000
 	;; startup
 	call	boot
 
-main_loop:
+main_game_loop:
 	halt
 
 	;; switch screen buffer
@@ -73,7 +73,7 @@ main_loop:
 	call	col_check_rockets
 	jp	c,main_collision
 	
-	jp 	main_loop
+	jp 	main_game_loop
 
 main_collision:
 	call	exps_reset
@@ -104,8 +104,20 @@ main_collision_loop:
 
 	;; paint and animate the explosion(s)
 	call	exps_paint
+	jp	c,main_outcome_loop
 
 	jp	main_collision_loop
+
+main_outcome_loop:
+	halt
+
+	;; Switch to screen 0
+	call swchto0
+
+	;; print the winner
+	call	txt_winner
+
+	jp	main_outcome_loop
 
 ;;; includes
 	include "boot.asm"
@@ -120,5 +132,6 @@ main_collision_loop:
 	include "math.asm"
 	include "newton.asm"
 	include	"graph.asm"
+	include "text.asm"
 	
 end $7000

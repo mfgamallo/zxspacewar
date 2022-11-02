@@ -80,4 +80,23 @@ swchto:
 	pop	bc		; restore state
 	ret
 
+;;; Switch to screen 0
+swchto0:
+	push	bc		; store current state
+	push	de
+
+	ld	de,$f005	; switch to screen 0, point 0xc000 to bank 5
+	ld	a,($5b5c)
+	and	d
+	or	e
+	ld	bc,$7ffd
+	di
+	ld	($5b5c),a
+	out	(c),a
+	ei
+
+	pop	de		; restore state
+	pop	bc
+	ret
+
 screen:	db	$00

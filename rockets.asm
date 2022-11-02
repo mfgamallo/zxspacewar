@@ -8,14 +8,14 @@ rocket1_posx:	dw	$8000
 rocket1_posy:	dw	$2000
 rocket1_velx:	dw	$0180
 rocket1_vely:	dw	$0000
-rocket1_rktsts:	db	$00
+rocket1_rktsts:	db	$01
 
 rocket2_rot:	db	$00
 rocket2_posx:	dw	$8000
 rocket2_posy:	dw	$a000
 rocket2_velx:	dw	$fe70
 rocket2_vely:	dw	$0000
-rocket2_rktsts:	db	$02
+rocket2_rktsts:	db	$03
 
 ;;; We keep these so we can delete them even after switching the
 ;;; screen buffer - we don't want to have to delete the whole
