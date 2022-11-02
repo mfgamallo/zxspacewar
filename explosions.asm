@@ -13,6 +13,10 @@ exps_reset:
 ;;; Sets the carry flag if it already cycled through all the explosion sprites
 exps_paint:
 	ld	a,(exp_sprite_count) 	; check if there's no more explosion sprites
+	srl	a
+	srl	a
+	srl	a
+	srl	a
 	sub	NUM_SPRITES
 	jp	c,esptc
 	scf
@@ -52,8 +56,10 @@ exp_paint:
 	ld	d,h
 	ld	e,l
 	ld	hl,exp_sprites
-	and	$1c		; get bit2, bit3 and bit4
+	and	$70		; get bit4, bit5 and bit6
 	sra	a		; shift to the right
+	sra	a
+	sra	a
 	ld	c,a
 	xor	a
 	ld	b,a
