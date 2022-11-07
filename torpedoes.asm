@@ -3,6 +3,19 @@
 	
 MAXTRP:	equ	10		; maximum number of torpedoes
 
+;;; Clear all the torpedoes
+trps_reset:
+	push	bc		; save current state
+	
+	ld	b,MAXTRP * bptrp
+	ld	hl,trp_list	; point at torpedo list
+tsrlp:	ld	(hl),0
+	inc	hl
+	djnz	tsrlp
+
+	pop	bc		; restore state
+	ret
+
 ;;; Expects
 ;;; A containing rotation
 ;;; BC containing X position

@@ -4,9 +4,42 @@
 
 org $7000
 
+READY_SECS:	equ	2
+WINNER_SECS:	equ	2
+	
 	;; startup
 	call	boot
 
+main_ready:
+	call swchto0
+
+	;; paint the rocket 1
+	call	reset_rocket1
+	call	load_rocket1
+	call 	rocket_paint
+
+	;; paint the rocket 2
+	call	reset_rocket2
+	call	load_rocket2
+	call 	rocket_paint
+
+	;; paint the star
+	call	paint_centre_star
+
+	;; Print message to get ready
+	call	txt_ready
+
+	ld	b,50*READY_SECS		; Wait READY_SECS.
+main_ready_loop:
+	halt
+	
+	djnz	main_ready_loop
+
+	;; Clear the screen
+	call	txt_dready
+
+main_game:
+	call	trps_reset	; delete all the previous torpedoes
 main_game_loop:
 	halt
 
@@ -102,22 +135,32 @@ main_collision_loop:
 	;; delete the torpedoes
 	call	trps_delete
 
+	;; paint the star
+	call	paint_centre_star
+
 	;; paint and animate the explosion(s)
 	call	exps_paint
-	jp	c,main_outcome_loop
+	jp	c,main_outcome
 
 	jp	main_collision_loop
 
-main_outcome_loop:
-	halt
-
+main_outcome:
 	;; Switch to screen 0
 	call swchto0
 
 	;; print the winner
 	call	txt_winner
 
-	jp	main_outcome_loop
+	ld	b,50*WINNER_SECS	; Wait WINNER_SECS
+main_outcome_loop:
+	halt
+
+	djnz	main_outcome_loop
+
+	;; Delete the rocket from the outcome
+	call	rocket_delete
+
+	jp	main_ready
 
 ;;; includes
 	include "boot.asm"
