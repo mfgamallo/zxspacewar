@@ -171,6 +171,11 @@ cwrnr	ld	b,(hl)			; point to the key row
 	inc	hl
 	inc	hl
 	inc	hl
+	inc	hl
+	inc	hl
+	inc	hl
+	inc	hl
+	inc	hl
 	dec	d
 	jp	nz,cwrnr		; iterate to check the next row
 	;; There's no keys being pressed. We can return

@@ -9,4 +9,5 @@ boot:
 	call 	setupscr
 	call	cleanscr
 	call	txt_select_channel_2 ; ready to print text
+	call	txt_set_white_on_black ; ensure text is white and background is black
 	ret

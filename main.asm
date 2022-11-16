@@ -25,7 +25,7 @@ main_welcome_loop:
 	jp	nc,main_welcome_loop
 
 	;; otherwise, delete the menu and go to the corresponding screen
-	call	txt_dmain_menu
+	call	txt_delete_main_menu
 	jp	(hl)
 
 main_player1_keys:
@@ -36,32 +36,48 @@ main_player1_keys_loop:
 	halt
 
 	;; Ask key for 'LEFT'
-	call	txt_flash_left
+	ld	d,24
+	ld	e,8
+	call	txt_flash_on
+	ld	hl,txt_white1
+	call	txt_print_at
 	call	ctrl_wait_release
 	call	ctrl_identify
-	call	txt_left_key
-	call	txt_key
+	call	txt_flash_off
+	call	txt_print_at
 	
 	;; Ask key for 'RIGHT'
-	call	txt_flash_right
+	ld	d,24
+	ld	e,10
+	call	txt_flash_on
+	ld	hl,txt_white1
+	call	txt_print_at
 	call	ctrl_wait_release
 	call	ctrl_identify
-	call	txt_right_key
-	call	txt_key
+	call	txt_flash_off
+	call	txt_print_at
 
 	;; Ask key for 'THRUST'
-	call	txt_flash_thrust
+	ld	d,24
+	ld	e,12
+	call	txt_flash_on
+	ld	hl,txt_white1
+	call	txt_print_at
 	call	ctrl_wait_release
 	call	ctrl_identify
-	call	txt_thrust_key
-	call	txt_key
+	call	txt_flash_off
+	call	txt_print_at
 
 	;; Ask key for 'FIRE'
-	call	txt_flash_fire
+	ld	d,24
+	ld	e,14
+	call	txt_flash_on
+	ld	hl,txt_white1
+	call	txt_print_at
 	call	ctrl_wait_release
 	call	ctrl_identify
-	call	txt_fire_key
-	call	txt_key
+	call	txt_flash_off
+	call	txt_print_at
 
 	jp	main_player1_keys_loop
 
@@ -82,7 +98,10 @@ main_ready:
 	call	paint_centre_star
 
 	;; Print message to get ready
-	call	txt_ready
+	ld	d,12
+	ld	e,8
+	ld	hl,txt_ready
+	call	txt_print_at
 
 	ld	b,50*READY_SECS		; Wait READY_SECS.
 main_ready_loop:
@@ -91,7 +110,10 @@ main_ready_loop:
 	djnz	main_ready_loop
 
 	;; Clear the screen
-	call	txt_dready
+	ld	d,12
+	ld	e,8
+	ld	hl,txt_white20
+	call	txt_print_at
 
 main_game:
 	call	trps_reset	; delete all the previous torpedoes
