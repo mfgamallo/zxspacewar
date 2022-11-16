@@ -10,8 +10,63 @@ WINNER_SECS:	equ	2
 	;; startup
 	call	boot
 
+main_welcome:
+	;; call	swchto0
+
+	;; paint the main menu
+	call	txt_main_menu
+main_welcome_loop:
+	halt
+
+	;; Read keyboard
+	call	ctrl_welcome
+
+	;; loop if none of the expected keys was pressed
+	jp	nc,main_welcome_loop
+
+	;; otherwise, delete the menu and go to the corresponding screen
+	call	txt_dmain_menu
+	jp	(hl)
+
+main_player1_keys:
+	;; Print current player 1 keys
+	call	txt_player1_keys
+
+main_player1_keys_loop:
+	halt
+
+	;; Ask key for 'LEFT'
+	call	txt_flash_left
+	call	ctrl_wait_release
+	call	ctrl_identify
+	call	txt_left_key
+	call	txt_key
+	
+	;; Ask key for 'RIGHT'
+	call	txt_flash_right
+	call	ctrl_wait_release
+	call	ctrl_identify
+	call	txt_right_key
+	call	txt_key
+
+	;; Ask key for 'THRUST'
+	call	txt_flash_thrust
+	call	ctrl_wait_release
+	call	ctrl_identify
+	call	txt_thrust_key
+	call	txt_key
+
+	;; Ask key for 'FIRE'
+	call	txt_flash_fire
+	call	ctrl_wait_release
+	call	ctrl_identify
+	call	txt_fire_key
+	call	txt_key
+
+	jp	main_player1_keys_loop
+
 main_ready:
-	call swchto0
+	call 	swchto0
 
 	;; paint the rocket 1
 	call	reset_rocket1
@@ -47,7 +102,7 @@ main_game_loop:
 	call	switch
 
 	;; read keyboard
-	call 	controls_read
+	call 	ctrl_game
 
 	;; delete the rocket 1
 	call	load_rocket1

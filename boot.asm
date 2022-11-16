@@ -8,4 +8,5 @@ boot:
 	call	switch		; switch screen
 	call 	setupscr
 	call	cleanscr
+	call	txt_select_channel_2 ; ready to print text
 	ret
