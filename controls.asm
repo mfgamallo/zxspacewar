@@ -1,6 +1,16 @@
 ;;; controls.asm
 ;;; Input control
 
+ctrl_player1_left:	dw	ctrl_key_o
+ctrl_player1_right:	dw	ctrl_key_p
+ctrl_player1_thrust:	dw	ctrl_key_q
+ctrl_player1_fire:	dw	ctrl_key_space
+
+ctrl_player2_left:	dw	ctrl_key_f
+ctrl_player2_right:	dw	ctrl_key_h
+ctrl_player2_thrust:	dw	ctrl_key_t
+ctrl_player2_fire:	dw	ctrl_key_g
+	
 ;;; If one of the expected keys is pressed, sets the carry flag and
 ;;; returns the address for the next jump in HL. Otherwise it resets
 ;;; the carry flag.
@@ -33,88 +43,101 @@ cwend:	pop	bc		; restore state
 
 ;;; Read the controls during the game
 ctrl_game:
-	ld	bc,$fbfe
-	in	a,(c)
-	ld	b,a
-	and	$01		; test for 'Q'
-	call	z,q_key_pressed
-	ld	a,b
-	and	$10		; test for 'T'
-	call	z,t_key_pressed
+	ld	c,$fe
 
-	ld	bc,$fdfe
+	ld	ix,(ctrl_player1_left)
+	ld	b,(ix+ckp)
 	in	a,(c)
-	ld	b,a
-	and	$08		; test for 'F'
-	call	z,f_key_pressed
-	ld	a,b
-	and	$10		; test for 'G'
-	call	z,g_key_pressed
+	and	(ix+ckb)
+	call	z,ctrl_p1_left_key_pressed
 
-	ld	bc,$dffe
+	ld	ix,(ctrl_player1_right)
+	ld	b,(ix+ckp)
 	in	a,(c)
-	ld	b,a
-	and	$01		; test por 'P'
-	call	z,p_key_pressed
-	ld	a,b
-	and	$02		; test for 'O'
-	call	z,o_key_pressed
-	
-	ld	bc,$bffe
-	in	a,(c)
-	and	$10		; test for 'H'
-	call	z,h_key_pressed
+	and	(ix+ckb)
+	call	z,ctrl_p1_right_key_pressed
 
-	ld	bc,$7ffe
+	ld	ix,(ctrl_player1_thrust)
+	ld	b,(ix+ckp)
 	in	a,(c)
-	and	$01		; test for 'SPACE'
-	call	z,space_key_pressed
+	and	(ix+ckb)
+	call	z,ctrl_p1_thrust_key_pressed
+
+	ld	ix,(ctrl_player1_fire)
+	ld	b,(ix+ckp)
+	in	a,(c)
+	and	(ix+ckb)
+	call	z,ctrl_p1_fire_key_pressed
+
+	ld	ix,(ctrl_player2_left)
+	ld	b,(ix+ckp)
+	in	a,(c)
+	and	(ix+ckb)
+	call	z,ctrl_p2_left_key_pressed
+
+	ld	ix,(ctrl_player2_right)
+	ld	b,(ix+ckp)
+	in	a,(c)
+	and	(ix+ckb)
+	call	z,ctrl_p2_right_key_pressed
+
+	ld	ix,(ctrl_player2_thrust)
+	ld	b,(ix+ckp)
+	in	a,(c)
+	and	(ix+ckb)
+	call	z,ctrl_p2_thrust_key_pressed
+
+	ld	ix,(ctrl_player2_fire)
+	ld	b,(ix+ckp)
+	in	a,(c)
+	and	(ix+ckb)
+	call	z,ctrl_p2_fire_key_pressed
 
 	ret
 
-p_key_pressed:
-	call	load_rocket1
-	call	rocket_rotate_right
-	call	save_rocket1
-	ret
-
-o_key_pressed:
+ctrl_p1_left_key_pressed:
 	call	load_rocket1
 	call	rocket_rotate_left
 	call	save_rocket1
 	ret
 
-q_key_pressed:
+ctrl_p1_right_key_pressed:
+	call	load_rocket1
+	call	rocket_rotate_right
+	call	save_rocket1
+	ret
+
+ctrl_p1_thrust_key_pressed:
 	call	load_rocket1
 	call	rocket_thrust
 	call	save_rocket1
 	ret
 
-space_key_pressed:
+ctrl_p1_fire_key_pressed:
 	call	load_rocket1
 	call	rocket_fire
 	call	save_rocket1
 	ret
 	
-h_key_pressed:
-	call	load_rocket2
-	call	rocket_rotate_right
-	call	save_rocket2
-	ret
-
-f_key_pressed:
+ctrl_p2_left_key_pressed:
 	call	load_rocket2
 	call	rocket_rotate_left
 	call	save_rocket2
 	ret
 
-t_key_pressed:
+ctrl_p2_right_key_pressed:
+	call	load_rocket2
+	call	rocket_rotate_right
+	call	save_rocket2
+	ret
+
+ctrl_p2_thrust_key_pressed:
 	call	load_rocket2
 	call	rocket_thrust
 	call	save_rocket2
 	ret
 
-g_key_pressed:
+ctrl_p2_fire_key_pressed:
 	call	load_rocket2
 	call	rocket_fire
 	call	save_rocket2
@@ -187,18 +210,183 @@ cwrnr	ld	b,(hl)			; point to the key row
 ;;; Key rows. The first element of each row is the "B" part of the keyboard row input address
 ctrl_key_data:
 	db 	$fe
-	dw	txt_key_shift,txt_key_z,txt_key_x,txt_key_c,txt_key_v
+	dw	ctrl_key_shift,ctrl_key_z,ctrl_key_x,ctrl_key_c,ctrl_key_v
 	db	$fd
-	dw	txt_key_a,txt_key_s,txt_key_d,txt_key_f,txt_key_g
+	dw	ctrl_key_a,ctrl_key_s,ctrl_key_d,ctrl_key_f,ctrl_key_g
         db	$fb
-	dw	txt_key_q,txt_key_w,txt_key_e,txt_key_r,txt_key_t
+	dw	ctrl_key_q,ctrl_key_w,ctrl_key_e,ctrl_key_r,ctrl_key_t
         db	$f7
-	dw	txt_key_1,txt_key_2,txt_key_3,txt_key_4,txt_key_5
+	dw	ctrl_key_1,ctrl_key_2,ctrl_key_3,ctrl_key_4,ctrl_key_5
         db	$ef
-	dw	txt_key_0,txt_key_9,txt_key_8,txt_key_7,txt_key_6
+	dw	ctrl_key_0,ctrl_key_9,ctrl_key_8,ctrl_key_7,ctrl_key_6
         db	$df
-	dw	txt_key_p,txt_key_o,txt_key_i,txt_key_u,txt_key_y
+	dw	ctrl_key_p,ctrl_key_o,ctrl_key_i,ctrl_key_u,ctrl_key_y
         db	$bf
-	dw	txt_key_enter,txt_key_l,txt_key_k,txt_key_j,txt_key_h
+	dw	ctrl_key_enter,ctrl_key_l,ctrl_key_k,ctrl_key_j,ctrl_key_h
         db	$7f
-	dw	txt_key_space,txt_key_symb,txt_key_m,txt_key_n,txt_key_b
+	dw	ctrl_key_space,ctrl_key_symb,ctrl_key_m,ctrl_key_n,ctrl_key_b
+
+ckp:	equ	0		; shift to the 'b' part of the i/o port
+ckb:	equ	1		; shift to the bit to isolate to test for
+ckk:	equ	2		; shift to the address to the key representation
+	
+ctrl_key_shift:
+	db	$fe
+	db	$01
+	dw	txt_key_shift
+ctrl_key_z:
+	db	$fe
+	db	$02
+	dw	txt_key_z
+ctrl_key_x:
+	db	$fe
+	db	$04
+	dw	txt_key_x
+ctrl_key_c:
+	db	$fe
+	db	$08
+	dw	txt_key_c
+ctrl_key_v:
+	db	$fe
+	db	$10
+	dw	txt_key_v
+ctrl_key_a:
+	db	$fd
+	db	$01
+	dw	txt_key_a
+ctrl_key_s:
+	db	$fd
+	db	$02
+	dw	txt_key_s
+ctrl_key_d:
+	db	$fd
+	db	$04
+	dw	txt_key_d
+ctrl_key_f:
+	db	$fd
+	db	$08
+	dw	txt_key_f
+ctrl_key_g:
+	db	$fd
+	db	$10
+	dw	txt_key_g
+ctrl_key_q:	
+	db	$fb
+	db	$01
+	dw	txt_key_q
+ctrl_key_w:
+	db	$fb
+	db	$02
+	dw	txt_key_w
+ctrl_key_e:
+	db	$fb
+	db	$04
+	dw	txt_key_e
+ctrl_key_r:
+	db	$fb
+	db	$08
+	dw	txt_key_r
+ctrl_key_t:
+	db	$fb
+	db	$10
+	dw	txt_key_t
+ctrl_key_1:	
+	db	$f7
+	db	$01
+	dw	txt_key_1
+ctrl_key_2:
+	db	$f7
+	db	$02
+	dw	txt_key_2
+ctrl_key_3:
+	db	$f7
+	db	$04
+	dw	txt_key_3
+ctrl_key_4:
+	db	$f7
+	db	$08
+	dw	txt_key_4
+ctrl_key_5:
+	db	$f7
+	db	$10
+	dw	txt_key_5
+ctrl_key_0:	
+        db	$ef
+	db	$01
+	dw	txt_key_0
+ctrl_key_9:
+	db	$ef
+	db	$02
+	dw	txt_key_9
+ctrl_key_8:
+	db	$ef
+	db	$04
+	dw	txt_key_8
+ctrl_key_7:
+	db	$ef
+	db	$08
+	dw	txt_key_7
+ctrl_key_6:
+	db	$ef
+	db	$10
+	dw	txt_key_6
+ctrl_key_p:	
+	db	$df
+	db	$01
+	dw	txt_key_p
+ctrl_key_o:
+	db	$df
+	db	$02
+	dw	txt_key_o
+ctrl_key_i:
+	db	$df
+	db	$04
+	dw	txt_key_i
+ctrl_key_u:
+	db	$df
+	db	$08
+	dw	txt_key_u
+ctrl_key_y:
+	db	$df
+	db	$10
+	dw	txt_key_y
+ctrl_key_enter:	
+	db	$bf
+	db	$01
+	dw	txt_key_enter
+ctrl_key_l:
+	db	$bf
+	db	$02
+	dw	txt_key_l
+ctrl_key_k:
+	db	$bf
+	db	$04
+	dw	txt_key_k
+ctrl_key_j:
+	db	$bf
+	db	$08
+	dw	txt_key_j
+ctrl_key_h:
+	db	$bf
+	db	$10
+	dw	txt_key_h
+ctrl_key_space:	
+	db	$7f
+	db	$01
+	dw	txt_key_space
+ctrl_key_symb:
+	db	$7f
+	db	$02
+	dw	txt_key_symb
+ctrl_key_m:
+	db	$7f
+	db	$04
+	dw	txt_key_m
+ctrl_key_n:
+	db	$7f
+	db	$08
+	dw	txt_key_n
+ctrl_key_b:
+	db	$7f
+	db	$10
+	dw	txt_key_b

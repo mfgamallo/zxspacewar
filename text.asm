@@ -118,6 +118,30 @@ txt_player1_keys:
 	pop	de		; restore state
 	ret
 
+;;; Delete menu with the player keys
+txt_delete_player_keys:
+	push	de		; save current state
+
+	ld	d,6
+	ld	e,8
+	ld	hl,txt_white25
+	call	txt_print_at
+	ld	d,6
+	ld	e,10
+	ld	hl,txt_white25
+	call	txt_print_at
+	ld	d,6
+	ld	e,12
+	ld	hl,txt_white25
+	call	txt_print_at
+	ld	d,6
+	ld	e,14
+	ld	hl,txt_white25
+	call	txt_print_at
+
+	pop	de		; restore state
+	ret
+
 ;;; Checks which of the rockets were hit and prints the relevant message
 txt_winner:
 	push	bc			; store current state
@@ -169,6 +193,7 @@ twmo:	call	txt_print_at
 
 txt_white1:		db	' ',0
 txt_white20:		db	'                    ',0
+txt_white25:		db	'                         ',0
 txt_p1_keys:		db	'1: PLAYER 1 KEYS',0
 txt_start_game:		db	'0: START GAME',0
 txt_draw:		db	'DRAW!',0

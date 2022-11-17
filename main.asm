@@ -32,9 +32,6 @@ main_player1_keys:
 	;; Print current player 1 keys
 	call	txt_player1_keys
 
-main_player1_keys_loop:
-	halt
-
 	;; Ask key for 'LEFT'
 	ld	d,24
 	ld	e,8
@@ -43,6 +40,10 @@ main_player1_keys_loop:
 	call	txt_print_at
 	call	ctrl_wait_release
 	call	ctrl_identify
+	ld	(ctrl_player1_left),hl
+	ld	ix,(ctrl_player1_left)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
 	call	txt_flash_off
 	call	txt_print_at
 	
@@ -54,6 +55,10 @@ main_player1_keys_loop:
 	call	txt_print_at
 	call	ctrl_wait_release
 	call	ctrl_identify
+	ld	(ctrl_player1_right),hl
+	ld	ix,(ctrl_player1_right)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
 	call	txt_flash_off
 	call	txt_print_at
 
@@ -65,6 +70,10 @@ main_player1_keys_loop:
 	call	txt_print_at
 	call	ctrl_wait_release
 	call	ctrl_identify
+	ld	(ctrl_player1_thrust),hl
+	ld	ix,(ctrl_player1_thrust)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
 	call	txt_flash_off
 	call	txt_print_at
 
@@ -76,10 +85,15 @@ main_player1_keys_loop:
 	call	txt_print_at
 	call	ctrl_wait_release
 	call	ctrl_identify
+	ld	(ctrl_player1_fire),hl
+	ld	ix,(ctrl_player1_fire)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
 	call	txt_flash_off
 	call	txt_print_at
 
-	jp	main_player1_keys_loop
+	call	txt_delete_player_keys
+	jp	main_welcome
 
 main_ready:
 	call 	swchto0
