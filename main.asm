@@ -2,7 +2,7 @@
 ;;; Game's main loop
 ;;; Includes every other asm file
 
-org $7000
+org $6000
 
 READY_SECS:	equ	2
 WINNER_SECS:	equ	2
@@ -31,67 +31,218 @@ main_welcome_loop:
 main_player1_keys:
 	;; Print current player 1 keys
 	call	txt_player1_keys
+	ld	d,24		; print current key for left
+	ld	e,8
+	ld	ix,(ctrl_player1_left)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+	ld	d,24		; print current key for right
+	ld	e,10
+	ld	ix,(ctrl_player1_right)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+	ld	d,24		; print current key for thrust
+	ld	e,12
+	ld	ix,(ctrl_player1_thrust)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+	ld	d,24		; print current key for fire
+	ld	e,14
+	ld	ix,(ctrl_player1_fire)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
 
 	;; Ask key for 'LEFT'
 	ld	d,24
 	ld	e,8
 	call	txt_flash_on
-	ld	hl,txt_white1
+	ld	ix,(ctrl_player1_left)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
 	call	txt_print_at
 	call	ctrl_wait_release
 	call	ctrl_identify
 	ld	(ctrl_player1_left),hl
+	call	txt_flash_off
+	ld	hl,txt_white10
+	call	txt_print_at
 	ld	ix,(ctrl_player1_left)
 	ld	l,(ix+ckk)
 	ld	h,(ix+ckk+1)
-	call	txt_flash_off
 	call	txt_print_at
 	
 	;; Ask key for 'RIGHT'
 	ld	d,24
 	ld	e,10
 	call	txt_flash_on
-	ld	hl,txt_white1
+	ld	ix,(ctrl_player1_right)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
 	call	txt_print_at
 	call	ctrl_wait_release
 	call	ctrl_identify
 	ld	(ctrl_player1_right),hl
+	call	txt_flash_off
+	ld	hl,txt_white10
+	call	txt_print_at
 	ld	ix,(ctrl_player1_right)
 	ld	l,(ix+ckk)
 	ld	h,(ix+ckk+1)
-	call	txt_flash_off
 	call	txt_print_at
 
 	;; Ask key for 'THRUST'
 	ld	d,24
 	ld	e,12
 	call	txt_flash_on
-	ld	hl,txt_white1
+	ld	ix,(ctrl_player1_thrust)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
 	call	txt_print_at
 	call	ctrl_wait_release
 	call	ctrl_identify
 	ld	(ctrl_player1_thrust),hl
+	call	txt_flash_off
+	ld	hl,txt_white10
+	call	txt_print_at
 	ld	ix,(ctrl_player1_thrust)
 	ld	l,(ix+ckk)
 	ld	h,(ix+ckk+1)
-	call	txt_flash_off
 	call	txt_print_at
 
 	;; Ask key for 'FIRE'
 	ld	d,24
 	ld	e,14
 	call	txt_flash_on
-	ld	hl,txt_white1
+	ld	ix,(ctrl_player1_fire)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
 	call	txt_print_at
 	call	ctrl_wait_release
 	call	ctrl_identify
 	ld	(ctrl_player1_fire),hl
+	call	txt_flash_off
+	ld	hl,txt_white10
+	call	txt_print_at
 	ld	ix,(ctrl_player1_fire)
 	ld	l,(ix+ckk)
 	ld	h,(ix+ckk+1)
 	call	txt_flash_off
 	call	txt_print_at
 
+	call	ctrl_wait_release
+	call	txt_delete_player_keys
+	jp	main_welcome
+
+main_player2_keys:
+	;; Print current player 2 keys
+	call	txt_player2_keys
+	ld	d,24		; print current key for left
+	ld	e,8
+	ld	ix,(ctrl_player2_left)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+	ld	d,24		; print current key for right
+	ld	e,10
+	ld	ix,(ctrl_player2_right)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+	ld	d,24		; print current key for thrust
+	ld	e,12
+	ld	ix,(ctrl_player2_thrust)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+	ld	d,24		; print current key for fire
+	ld	e,14
+	ld	ix,(ctrl_player2_fire)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+
+	;; Ask key for 'LEFT'
+	ld	d,24
+	ld	e,8
+	call	txt_flash_on
+	ld	ix,(ctrl_player2_left)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+	call	ctrl_wait_release
+	call	ctrl_identify
+	ld	(ctrl_player2_left),hl
+	call	txt_flash_off
+	ld	hl,txt_white10
+	call	txt_print_at
+	ld	ix,(ctrl_player2_left)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+	
+	;; Ask key for 'RIGHT'
+	ld	d,24
+	ld	e,10
+	call	txt_flash_on
+	ld	ix,(ctrl_player2_right)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+	call	ctrl_wait_release
+	call	ctrl_identify
+	ld	(ctrl_player2_right),hl
+	call	txt_flash_off
+	ld	hl,txt_white10
+	call	txt_print_at
+	ld	ix,(ctrl_player2_right)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+
+	;; Ask key for 'THRUST'
+	ld	d,24
+	ld	e,12
+	call	txt_flash_on
+	ld	ix,(ctrl_player2_thrust)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+	call	ctrl_wait_release
+	call	ctrl_identify
+	ld	(ctrl_player2_thrust),hl
+	call	txt_flash_off
+	ld	hl,txt_white10
+	call	txt_print_at
+	ld	ix,(ctrl_player2_thrust)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+
+	;; Ask key for 'FIRE'
+	ld	d,24
+	ld	e,14
+	call	txt_flash_on
+	ld	ix,(ctrl_player2_fire)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_print_at
+	call	ctrl_wait_release
+	call	ctrl_identify
+	ld	(ctrl_player2_fire),hl
+	call	txt_flash_off
+	ld	hl,txt_white10
+	call	txt_print_at
+	ld	ix,(ctrl_player2_fire)
+	ld	l,(ix+ckk)
+	ld	h,(ix+ckk+1)
+	call	txt_flash_off
+	call	txt_print_at
+
+	call	ctrl_wait_release
 	call	txt_delete_player_keys
 	jp	main_welcome
 
@@ -268,4 +419,4 @@ main_outcome_loop:
 	include	"graph.asm"
 	include "text.asm"
 	
-end $7000
+end $6000

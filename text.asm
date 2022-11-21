@@ -67,8 +67,10 @@ txt_main_menu:
 	ld	e,10
 	ld	hl,txt_p1_keys
 	call	txt_print_at
-	ld	d,10
 	ld	e,12
+	ld	hl,txt_p2_keys
+	call	txt_print_at
+	ld	e,14
 	ld	hl,txt_start_game
 	call	txt_print_at
 
@@ -77,8 +79,7 @@ txt_main_menu:
 	
 ;;; Delete the main menu text
 txt_delete_main_menu:
-	push	bc		; save current state
-	push	de
+	push	de		; save current state
 	push	hl
 
 	ld	d,10
@@ -88,10 +89,12 @@ txt_delete_main_menu:
 	ld	e,12
 	ld	hl,txt_white20
 	call	txt_print_at
+	ld	e,14
+	ld	hl,txt_white20
+	call	txt_print_at
 
 	pop	hl		; restore state
 	pop	de
-	pop	bc
 	ret
 
 ;;; Redefine player 1's keys
@@ -113,6 +116,30 @@ txt_player1_keys:
 	ld	d,6
 	ld	e,14
 	ld	hl,txt_p1_fire
+	call	txt_print_at
+
+	pop	de		; restore state
+	ret
+
+;;; Redefine player 2's keys
+txt_player2_keys:
+	push	de		; save current state
+
+	ld	d,6
+	ld	e,8
+	ld	hl,txt_p2_left
+	call	txt_print_at
+	ld	d,6
+	ld	e,10
+	ld	hl,txt_p2_right
+	call	txt_print_at
+	ld	d,6
+	ld	e,12
+	ld	hl,txt_p2_thrust
+	call	txt_print_at
+	ld	d,6
+	ld	e,14
+	ld	hl,txt_p2_fire
 	call	txt_print_at
 
 	pop	de		; restore state
@@ -192,9 +219,11 @@ twmo:	call	txt_print_at
 	ret
 
 txt_white1:		db	' ',0
+txt_white10:		db	'          ',0
 txt_white20:		db	'                    ',0
 txt_white25:		db	'                         ',0
 txt_p1_keys:		db	'1: PLAYER 1 KEYS',0
+txt_p2_keys:		db	'2: PLAYER 2 KEYS',0
 txt_start_game:		db	'0: START GAME',0
 txt_draw:		db	'DRAW!',0
 txt_wins:		db	'WINS!',0
@@ -203,6 +232,10 @@ txt_p1_left:		db	'PLAYER 1 LEFT.....',0
 txt_p1_right:		db	'PLAYER 1 RIGHT....',0
 txt_p1_thrust:		db	'PLAYER 1 THRUST...',0
 txt_p1_fire:		db	'PLAYER 1 FIRE.....',0
+txt_p2_left:		db	'PLAYER 2 LEFT.....',0
+txt_p2_right:		db	'PLAYER 2 RIGHT....',0
+txt_p2_thrust:		db	'PLAYER 2 THRUST...',0
+txt_p2_fire:		db	'PLAYER 2 FIRE.....',0
 	
 txt_key_shift:		db	'SHIFT',0
 txt_key_z:		db	'Z',0

@@ -35,7 +35,16 @@ cwno0:	ld	bc,$f7fe
 	scf
 	jp	cwend
 
-cwno1:
+cwno1:	ld	bc,$f7fe
+	in	a,(c)
+	ld	b,a
+	and	$02		; test for '2'
+	jp	nz,cwno2	; if not pressed, check the rest of the keys
+	ld	hl,main_player2_keys	; otherwise, get ready for redefining the keys for player 2
+	scf
+	jp	cwend
+
+cwno2:	
 	
 	xor	a		; resets the carry flag
 cwend:	pop	bc		; restore state
