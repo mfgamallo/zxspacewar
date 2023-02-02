@@ -1,4 +1,4 @@
-(setq fat_rocket_models
+(setq fat-rocket-models
       '(
 	("0000000000000000"
 	 "0000000100000000"
@@ -147,7 +147,7 @@
 	)
       )
 
-(setq slim_rocket_models
+(setq slim-rocket-models
       '(
 	("0000000110000000"
 	 "0000001001000000"
@@ -500,8 +500,8 @@
   (set-buffer "*scratch*")
   (insert text))
 
-;; (let ((text (generate-all models)))
-;;   (send-to-scratch text))
+(let ((text (generate-all fat-rocket-models)))
+  (send-to-scratch text))
 
 ;; (let ((text (generate-noflips explosion-models)))
 ;;   (send-to-scratch text))

@@ -39,7 +39,65 @@ paint_xy_sprite:
 
 	pop	bc		; restore state
 	ret
-	
+
+;;; Paint a sprite horizontally mirrored
+;;; DE containing X and Y
+;;; HL containing the pre-shifted sprite group
+paint_xy_sprite_hm:
+	push	bc		; store current state
+
+	ld	b,d		; remember the x coordinate so we can get the shifted sprite
+	ex	de,hl		; HL containing the X,Y coordinates now
+	call	pos_to_address	; get the screen memory address that corresponds to the x,y coordinates
+	ex	de,hl		; now DE = screen memory and HL = sprite group
+	ld	a,b		; load the x coordinate into a
+	and	7		; use as index for shifting the sprite
+	neg			; because we want to print the sprite horizontally mirrored, we get the sprite
+	add	a,7		; shifted in the inverse order (right to left)
+	call	get_sprite	; get the definitive (shifted) sprite
+	call	paint_sprite_hm
+
+	pop	bc		; restore state
+	ret
+
+;;; Paint a sprite vertically mirrored
+;;; DE containing X and Y
+;;; HL containing the pre-shifted sprite group
+paint_xy_sprite_vm:
+	push	bc		; store current state
+
+	ld	b,d		; remember the x coordinate so we can get the shifted sprite
+	ex	de,hl		; HL containing the X,Y coordinates now
+	call	pos_to_address	; get the screen memory address that corresponds to the x,y coordinates
+	ex	de,hl		; now DE = screen memory and HL = sprite group
+	ld	a,b		; load the x coordinate into a
+	and	7		; use as index for shifting the sprite
+	call	get_sprite	; get the definitive (shifted) sprite
+	call	paint_sprite_vm
+
+	pop	bc		; restore state
+	ret
+
+;;; Paint a sprite horizontally AND vertically mirrored
+;;; DE containing X and Y
+;;; HL containing the pre-shifted sprite group
+paint_xy_sprite_vhm:
+	push	bc		; store current state
+
+	ld	b,d		; remember the x coordinate so we can get the shifted sprite
+	ex	de,hl		; HL containing the X,Y coordinates now
+	call	pos_to_address	; get the screen memory address that corresponds to the x,y coordinates
+	ex	de,hl		; now DE = screen memory and HL = sprite group
+	ld	a,b		; load the x coordinate into a
+	and	7		; use as index for shifting the sprite
+	neg			; because we want to print the sprite horizontally mirrored, we get the sprite
+	add	a,7		; shifted in the inverse order (right to left)
+	call	get_sprite	; get the definitive (shifted) sprite
+	call	paint_sprite_vhm
+
+	pop	bc		; restore state
+	ret
+
 ;;; Paint a sprite 24 pixels wide and 16 pixels tall
 ;;; HL pointing to sprite
 ;;; DE pointing to screen
@@ -68,6 +126,134 @@ pslp:	ld	a,(de)		; get one byte from the screen
 	call	line_down	; next line of the sprite
 	ex	de,hl
 	djnz	pslp
+
+	pop	bc		; restore state
+	ret
+
+;;; Paint a horizontally mirrored sprite 24 pixels wide and 16 pixels tall
+;;; HL pointing to sprite
+;;; DE pointing to screen
+paint_sprite_hm:
+	push	bc		; store current state
+	ld	b,16		; the sprite is 16 lines high
+	
+pslph:	inc	hl		; point to the last byte in the line
+	inc	hl		; (because we're mirroring horizontally)
+	ld	a,(de)		; get one byte from the screen
+	ld	c,a
+	ld 	a,(hl)		; get a byte from the sprite
+	call	mirror_byte	; mirror the byte
+	or	c		; or it with the byte from the screen
+	ld	(de),a		; put in on the screen
+	dec	hl		; previous byte
+	inc	e		; next column
+	ld	a,(de)
+	ld	c,a
+	ld	a,(hl)
+	call	mirror_byte
+	or	c
+	ld	(de),a
+	dec	hl
+	inc	e
+	ld	a,(de)
+	ld	c,a
+	ld	a,(hl)
+	call	mirror_byte
+	or	c
+	ld	(de),a
+	inc	hl
+	inc	hl
+	inc	hl
+	
+	dec	e		; point to the beginning of the sprite
+	dec	e
+	ex	de,hl
+	call	line_down	; next line of the sprite
+	ex	de,hl
+	djnz	pslph
+
+	pop	bc		; restore state
+	ret
+
+;;; Paint a sprite vertically mirrored 24 pixels wide and 16 pixels tall
+;;; HL pointing to sprite
+;;; DE pointing to screen
+paint_sprite_vm:
+	push	bc		; store current state
+
+	ld	b,0
+	ld	c,45
+	add	hl,bc
+	ld	b,16		; the sprite is 16 lines high
+pslpv:	ld	a,(de)		; get one byte from the screen
+	or 	(hl)		; or it with a byte from the sprite
+	ld	(de),a		; put in on the screen
+	inc	hl		; next byte
+	inc	e		; next column
+	ld	a,(de)
+	or	(hl)
+	ld	(de),a
+	inc	hl
+	inc	e
+	ld	a,(de)
+	or	(hl)
+	ld	(de),a
+	dec	hl		; point to the previous line
+	dec	hl		; (because we're painting the sprite vertically mirrored)
+	dec	hl
+	dec	hl
+	dec	hl
+	
+	dec	e		; point to the beginning of the sprite
+	dec	e
+	ex	de,hl
+	call	line_down	; next line of the sprite
+	ex	de,hl
+	djnz	pslpv
+
+	pop	bc		; restore state
+	ret
+
+;;; Paint a sprite vertically AND horizontally mirrored 24 pixels wide and 16 pixels tall
+;;; HL pointing to sprite
+;;; DE pointing to screen
+paint_sprite_vhm:
+	push	bc		; store current state
+
+	ld	b,0
+	ld	c,47
+	add	hl,bc
+	ld	b,16		; the sprite is 16 lines high
+pslpvh:	ld	a,(de)		; get one byte from the screen
+	ld	c,a
+	ld 	a,(hl)		; get a byte from the sprite
+	call	mirror_byte	; mirror the byte
+	or	c		; or it with the byte from the screen
+	ld	(de),a		; put in on the screen
+	dec	hl		; next byte
+	inc	e		; next column
+	ld	a,(de)
+	ld	c,a
+	ld 	a,(hl)
+	call	mirror_byte
+	or	c
+	ld	(de),a
+	dec	hl
+	inc	e
+	ld	a,(de)
+	ld	c,a
+	ld 	a,(hl)
+	call	mirror_byte
+	or	c
+	ld	(de),a
+	dec	hl		; point to the previous line
+				; (because we're painting the sprite vertically mirrored)
+	dec	e		; point to the beginning of the sprite
+	dec	e
+	ex	de,hl
+	call	line_down	; next line of the sprite
+	ex	de,hl
+	djnz	pslpvh
 
 	pop	bc		; restore state
 	ret
@@ -184,19 +370,29 @@ pos_to_address:
 	pop	bc		; restore state
 	ret
 
-;;; Get a sprite properly rotated
+;;; Paint a sprite properly rotated.
 ;;; A containing rotation
-;;; HL pointint to the pack of sprite groups
-;;; Returns HL pointing to the rotated sprite group
-rotate_sprite:
+;;; HL pointing to the pack of sprite groups
+rotate_and_paint_sprite:
 	push	bc		; store current state
 	push	de
 
-	srl	a		; there's 16 possible rotated sprites
-	srl	a		; each address is 2 bytes, so we
-	srl	a		; use the most significant bits and
-	res	0,a		; ensure bit 0 is reset
-	
+	push	af
+	and	%01111000	; reset bits 0, 1, 2, 7
+	cp	72
+	jp	nc,rspe		; check wether to invert the number or not
+	sra	a		; shift 2 (because each address is two bytes) to the right filling with 0
+	sra	a
+	jp	rspn
+rspe:	
+	sla	a	; shift 1 to the left
+	sra	a	; shift 4 to the right filling with previous
+	sra	a
+	sra	a
+	sra	a
+	neg 		; 2s complement, return
+	sla	a
+rspn:	
 	ld	c,a		; load a into bc
 	xor	a
 	ld	b,a
@@ -206,10 +402,23 @@ rotate_sprite:
 	ld	d,(hl)
 	ex	de,hl		; move de to hl, ready to return
 
+	pop	af		; decide which mirroring we're going to apply
 	pop	de		; restore state
 	pop	bc
+	and	%11000000	; check the first two bits
+	jp	z,rsnvnh		; if it's 00, there's no need to mirror
+	cp	64
+	jp	z,rsvnh			; if it's 01, mirror vertically
+	cp	128
+	jp	z,rsvh			; if it's 10, mirror both vertically and horizontally
+	call	paint_xy_sprite_hm	; else (11), mirror horizontally
 	ret
-	
+rsnvnh:	call	paint_xy_sprite
+	ret
+rsvnh:	call	paint_xy_sprite_vm
+	ret
+rsvh:	call	paint_xy_sprite_vhm
+	ret
 	
 ;;; Get the rightly shifted sprite depending on the pixel
 ;;; A holds the pixel
@@ -237,6 +446,33 @@ get_sprite:
 	pop	bc
 	ret
 
+;;; Mirrors one byte
+;;; A holds the byte to mirror
+;;; The mirrored byte is returned in A itself
+mirror_byte:
+	push	bc		; store current status
+
+	ld	b,a
+	rlc	b
+	rra
+	rlc	b
+	rra
+	rlc	b
+	rra
+	rlc	b
+	rra
+	rlc	b
+	rra
+	rlc	b
+	rra
+	rlc	b
+	rra
+	rlc	b
+	rra
+	
+	pop	bc		; restore status
+	ret
+	
 ;;; Get the right byte to paint a single dot at a specific point
 ;;; A holds the pixel inside the byte
 ;;; returns A with the right byte
