@@ -327,9 +327,11 @@ main_game_loop:
 	call	save_old_rocket2
 	call	save_rocket2
 
+	halt
+	
 	;; check for collisions between the two rockets
 	call	col_rockets
-	
+
 	;; paint the star
 	call	paint_centre_star
 	
